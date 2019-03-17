@@ -5,43 +5,68 @@ export class GraphicsPresenter{
   constructor(stage, renderer){
     this.logger = createLogger('GraphicsPresenter');
     this.graphics = [];
+    this.resetMinMax();
+    this.renderer = renderer;
+    this.stage = stage;
+    this.firstXIndex = 0;
+    this.lastXindex = undefined;
+  }
+
+  resetMinMax() {
     this.minY = Number.MAX_SAFE_INTEGER;
     this.maxY = 0;
-    this.renderer = renderer;
   }
 
-  //TODO make one x set and interpolate y
+//TODO make one x set and interpolate y
   addGraphic(graphic){
-    this.graphics.push();
-    const g1MinMaxY = graphic.getMinMaxByIndexes();
-    this.logger.log('MinMaxY',  g1MinMaxY);
-    this.minY = Math.min(g1MinMaxY.min, this.minY);
-    this.maxY = Math.max(g1MinMaxY.max,g2MinMaxY.max);
-
-    let ystepsOnData = Math.round((yRange) / ysteps);
+    this.graphics.push(graphic);
+    if(this.lastXindex === undefined) {
+      this.lastXindex = graphic.x.length;
+    }
+    const gminMaxY = graphic.getMinMaxByIndexes(this.firstXIndex, this.lastXindex);
+    this.logger.log('MinMaxY',  gminMaxY);
+    this.minY = Math.min(gminMaxY.min, this.minY);
+    this.maxY = Math.max(gminMaxY.max, this.maxY);
   }
 
-
-  draw() {
+  draw(firstIndex,lastIndex) {
+    if(isFinite(firstIndex) || isFinite(lastIndex)) {
+      this.setXRange(firstIndex, lastIndex);
+    }
     this.graphics.forEach( (graphic) => {
       this.drawGraphic(graphic);
     });
   };
 
+
+  setXRange(firstIndex, lastIndex) {
+    if ((isFinite(firstIndex) && firstIndex !== this.firstXIndex) || (isFinite(lastIndex) && lastIndex !== this.lastXindex)) {
+      this.firstXIndex = firstIndex;
+      this.lastXindex = lastIndex;
+      this.resetMinMax();
+      this.graphics.forEach((graphic) => {
+        const gminMaxY = graphic.getMinMaxByIndexes(this.firstXIndex, this.lastXindex);
+        this.logger.log('MinMaxY', gminMaxY);
+        this.minY = Math.min(gminMaxY.min, this.minY);
+        this.maxY = Math.max(gminMaxY.max, this.maxY);
+      });
+    }
+  }
+
   drawGraphic(graphic) {
     let x0, y0;
     const yRange = this.maxY - this.minY;
-    const xColumn = graphic.x;
-    const xMult = stage.width / xColumn.length;
-    const yMult = stage.height / yRange;
+    const xRange = this.lastXindex - this.firstXIndex;
+    const xMult = this.stage.width / xRange;
+    const yMult = this.stage.height / yRange;
 
-    for (let i = 0; i < graphic.x.length; i++) {
+    for (let i = this.firstXIndex; i < this.lastXindex; i++) {
       if (x0 === undefined) {
-        x0 = i * xMult;
+        x0 = (i - this.firstXIndex) * xMult;
         y0 = (graphic.y[i] - this.minY) * yMult;
         continue;
       }
-      let x = i * xMult;
+      let x = (i - this.firstXIndex)  * xMult;
       let y = (graphic.y[i] - this.minY) * yMult;
       this.renderer.line({x: x0, y: y0}, {x: x, y: y}, graphic.color);
       this.logger.log(`x:${x} y:${y}`);

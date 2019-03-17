@@ -48,10 +48,10 @@ export default class Graphic {
       left=0;
     }
     if(!(!!right)){
-      right = this.y.length-1;
+      right = this.y.length;
     }
     let min = Number.MAX_SAFE_INTEGER;
-    let max = this.y[right];
+    let max = 0;
 
     for (let i = left; i < right; i++) {
       if (min > this.y[i]) {

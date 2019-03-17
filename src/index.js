@@ -3,6 +3,7 @@ import Graphic from "./app/Graphic";
 import graphic_data from '../data/chart_data.json';
 import RenderCoords from "./app/RenderCoords";
 import RendererCanvas from "./app/RendererCanvas";
+import {GraphicsPresenter} from "./app/GraphicsPresenter";
 
 
 let context = window || global;
@@ -31,12 +32,12 @@ app.run = () => {
   let yColumn = graphic_data[0]['columns'][1].slice(1);
   let yColumn2 = graphic_data[0]['columns'][2].slice(1);
 
-  let graphic1 = new Graphic(xColumn, yColumn);
+  let graphic1 = new Graphic(xColumn, yColumn, 'cyan');
   console.log(xColumn.length, xColumn);
   console.log(yColumn.length, yColumn);
   console.log(graphic1.getMinMaxByIndexes(10, 102));
 
-  let graphic2 = new Graphic(xColumn, yColumn2);
+  let graphic2 = new Graphic(xColumn, yColumn2, 'orange');
 
   console.log('g2',yColumn2.length, yColumn2);
   console.log('g2',graphic2.getMinMaxByIndexes(10, 102));
@@ -114,7 +115,26 @@ app.run = () => {
   ctx.fill();
 
 
+  {
 
+    let canvas = document.getElementById("canvas2");
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    let ctx = canvas.getContext('2d');
+    const stage = {
+      width : 1000,
+      height:1000
+    };
+    ctx.resetTransform();
+
+    const renderer = new RendererCanvas(ctx, canvas.width, canvas.height, 0, 0);
+
+    let gp = new GraphicsPresenter(stage,renderer);
+    gp.addGraphic(graphic1);
+    gp.addGraphic(graphic2);
+    gp.setXRange(100,111);
+    gp.draw();
+  }
 
 
   /*let scene = new Scene(ctx, stage);

@@ -1,7 +1,7 @@
-export const createLogger = (context: string): ILogger => {
-  const next = (level: string) => (...args: any[]) =>
+export const createLogger = (context) => {
+  const next = (level) => (...args) =>
       console[level](...[...[context + '::'], ...args]);
-  const getNextOrNoop = (level: string) => next(level);
+  const getNextOrNoop = (level) => next(level);
 
   const loggerInstance = {
     debug: getNextOrNoop('log'),
