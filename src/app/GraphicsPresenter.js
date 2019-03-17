@@ -29,6 +29,10 @@ export class GraphicsPresenter{
     this.maxY = Math.max(gminMaxY.max, this.maxY);
   }
 
+  clear(){
+    this.renderer.clear();
+  }
+
   draw(firstIndex,lastIndex) {
     if(isFinite(firstIndex) || isFinite(lastIndex)) {
       this.setXRange(firstIndex, lastIndex);

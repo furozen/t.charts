@@ -132,8 +132,24 @@ app.run = () => {
     let gp = new GraphicsPresenter(stage,renderer);
     gp.addGraphic(graphic1);
     gp.addGraphic(graphic2);
-    gp.setXRange(100,111);
-    gp.draw();
+    const lastIndex = 111;
+    let firstIndex = 0;
+    const maxFirstIndex = 100;
+
+    const update = ()=>{
+      gp.clear();
+      gp.setXRange(firstIndex,lastIndex);
+      gp.draw();
+
+      requestAnimationFrame(() => {
+        if(firstIndex<=maxFirstIndex) {
+          update();
+        }
+        firstIndex+=5;
+      });
+    };
+    update();
+
   }
 
 

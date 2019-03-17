@@ -22,6 +22,10 @@ export default class RendererCanvas {
     return {x, y};
   }
 
+  clear(){
+    this.ctx.clearRect(0, 0, this.width, this.height)
+  }
+
   line(pA, pB, color) {
     this.ctx.resetTransform();
     /*   this.ctx.save();                  // Save the current state
