@@ -28,18 +28,6 @@ export default class RendererCanvas {
 
   line(pA, pB, color) {
     this.ctx.resetTransform();
-    /*   this.ctx.save();                  // Save the current state
-       this.ctx.resetTransform();
-       this.ctx.beginPath();
-       const pFrom = this.transform(pA);
-       console.log('pa:', pA, ' pFrom:', pFrom);
-       this.ctx.moveTo(pFrom.x, pFrom.y);
-       const pTo = this.transform(pB);
-       console.log('pb:', pB, ' pTo:', pTo);
-       this.ctx.lineTo(pTo.x, pTo.y);
-       this.ctx.closePath();
-       this.ctx.stroke();
-       this.ctx.restore();*/
 
     this.ctx.save();
     this.ctx.beginPath();

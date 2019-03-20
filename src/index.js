@@ -130,6 +130,7 @@ app.run = () => {
     const renderer = new RendererCanvas(ctx, canvas.width, canvas.height, 0, 0);
 
     let gp = new GraphicsPresenter(stage,renderer);
+
     gp.addGraphic(graphic1);
     gp.addGraphic(graphic2);
     const lastIndex = 111;
@@ -140,13 +141,18 @@ app.run = () => {
       gp.clear();
       gp.setXRange(firstIndex,lastIndex);
       gp.draw();
-
-      requestAnimationFrame(() => {
-        if(firstIndex<=maxFirstIndex) {
-          update();
-        }
-        firstIndex+=5;
-      });
+      let tm = setTimeout( () => {
+        requestAnimationFrame(() => {
+          if(firstIndex<=maxFirstIndex) {
+            update();
+          }
+          firstIndex+=5;
+          if(firstIndex > 50){
+            graphic1.disable();
+          }
+          clearTimeout(tm);
+        })
+      }, 50);
     };
     update();
 

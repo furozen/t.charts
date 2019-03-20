@@ -38,7 +38,9 @@ export class GraphicsPresenter{
       this.setXRange(firstIndex, lastIndex);
     }
     this.graphics.forEach( (graphic) => {
-      this.drawGraphic(graphic);
+      if(graphic.enabled) {
+        this.drawGraphic(graphic);
+      }
     });
   };
 
@@ -49,10 +51,12 @@ export class GraphicsPresenter{
       this.lastXindex = lastIndex;
       this.resetMinMax();
       this.graphics.forEach((graphic) => {
-        const gminMaxY = graphic.getMinMaxByIndexes(this.firstXIndex, this.lastXindex);
-        this.logger.log('MinMaxY', gminMaxY);
-        this.minY = Math.min(gminMaxY.min, this.minY);
-        this.maxY = Math.max(gminMaxY.max, this.maxY);
+        if(graphic.enabled) {
+          const gminMaxY = graphic.getMinMaxByIndexes(this.firstXIndex, this.lastXindex);
+          this.logger.log('MinMaxY', gminMaxY);
+          this.minY = Math.min(gminMaxY.min, this.minY);
+          this.maxY = Math.max(gminMaxY.max, this.maxY);
+        }
       });
     }
   }

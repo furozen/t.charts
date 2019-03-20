@@ -6,6 +6,7 @@ export default class Graphic {
     this.x = x;
     this.y = y;
     this.color = color;
+    this.enabled =  true;
   }
 
   getMaxXIndex(rightBorderX) {
@@ -24,6 +25,13 @@ export default class Graphic {
       }
     }
     return 0;
+  }
+
+  disable(){
+    this.enabled = false;
+  }
+  enable(){
+    this.enabled = true;
   }
 
   getMinXIndex(leftBorderX) {
