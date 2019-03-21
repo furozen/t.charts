@@ -4,7 +4,7 @@ export class GraphicsPresenter{
 
   constructor(stage, renderer){
     this.logger = createLogger('GraphicsPresenter');
-    this.graphics = [];
+    this.yDatas = [];
     this.resetMinMax();
     this.renderer = renderer;
     this.stage = stage;
@@ -17,13 +17,15 @@ export class GraphicsPresenter{
     this.maxY = 0;
   }
 
-//TODO make one x set and interpolate y
-  addGraphic(graphic){
-    this.graphics.push(graphic);
-    if(this.lastXindex === undefined) {
-      this.lastXindex = graphic.x.length;
-    }
-    const gminMaxY = graphic.getMinMaxByIndexes(this.firstXIndex, this.lastXindex);
+  setXCount(xCount){
+    this.xCount = xCount
+    this.lastXindex = xCount.x.length;
+  }
+
+  addYData(yData){
+    this.yDatas.push(yData);
+
+    const gminMaxY = yData.getMinMaxByIndexes(this.firstXIndex, this.lastXindex);
     this.logger.log('MinMaxY',  gminMaxY);
     this.minY = Math.min(gminMaxY.min, this.minY);
     this.maxY = Math.max(gminMaxY.max, this.maxY);
@@ -37,9 +39,9 @@ export class GraphicsPresenter{
     if(isFinite(firstIndex) || isFinite(lastIndex)) {
       this.setXRange(firstIndex, lastIndex);
     }
-    this.graphics.forEach( (graphic) => {
-      if(graphic.enabled) {
-        this.drawGraphic(graphic);
+    this.yDatas.forEach( (yData) => {
+      if(yData.enabled) {
+        this.drawGraphic(yData);
       }
     });
   };
@@ -50,9 +52,9 @@ export class GraphicsPresenter{
       this.firstXIndex = firstIndex;
       this.lastXindex = lastIndex;
       this.resetMinMax();
-      this.graphics.forEach((graphic) => {
-        if(graphic.enabled) {
-          const gminMaxY = graphic.getMinMaxByIndexes(this.firstXIndex, this.lastXindex);
+      this.yDatas.forEach((yData) => {
+        if(yData.enabled) {
+          const gminMaxY = yData.getMinMaxByIndexes(this.firstXIndex, this.lastXindex);
           this.logger.log('MinMaxY', gminMaxY);
           this.minY = Math.min(gminMaxY.min, this.minY);
           this.maxY = Math.max(gminMaxY.max, this.maxY);
@@ -61,26 +63,26 @@ export class GraphicsPresenter{
     }
   }
 
-  drawGraphic(graphic) {
+  drawGraphic(yData) {
     let x0, y0;
     const yRange = this.maxY - this.minY;
     const xRange = this.lastXindex - this.firstXIndex;
     const xMult = this.stage.width / xRange;
     const yMult = this.stage.height / yRange;
 
-    for (let i = this.firstXIndex; i < this.lastXindex; i++) {
-      if (x0 === undefined) {
-        x0 = (i - this.firstXIndex) * xMult;
-        y0 = (graphic.y[i] - this.minY) * yMult;
+    this.renderer.prepToDraw(yData.color);
+    for (let i = this.firstXIndex; i <= this.lastXindex; i++) {
+      let x = (i - this.firstXIndex)  * xMult;
+      let y = (yData.y[i] - this.minY) * yMult;
+      if (i === this.firstXIndex) {
+        this.renderer.moveTo({x, y});
+        this.logger.log(`m x:${x} y:${y}`);
         continue;
       }
-      let x = (i - this.firstXIndex)  * xMult;
-      let y = (graphic.y[i] - this.minY) * yMult;
-      this.renderer.line({x: x0, y: y0}, {x: x, y: y}, graphic.color);
+      this.renderer.lineTo({x, y});
       this.logger.log(`x:${x} y:${y}`);
-      x0 = x;
-      y0 = y;
 
     }
+    this.renderer.finishDraw();
   }
 }

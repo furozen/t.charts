@@ -27,19 +27,31 @@ export default class RendererCanvas {
   }
 
   line(pA, pB, color) {
-    this.ctx.resetTransform();
+    this.prepToDraw(color);
+    this.moveTo(pA);
+    this.lineTo(pB);
+    this.finishDraw();
+  }
 
+  lineTo(pB) {
+    this.ctx.lineTo(pB.x, pB.y);
+  }
+
+  moveTo(pA) {
+    this.ctx.moveTo(pA.x, pA.y);
+  }
+
+  finishDraw() {
+    this.ctx.stroke();
+    this.ctx.restore();
+  }
+
+  prepToDraw(color) {
+    this.ctx.resetTransform();
     this.ctx.save();
     this.ctx.beginPath();
     this.ctx.transform(this.a, this.b, this.c, -1 * this.d, this.tx, this.ty);
     this.ctx.translate(0, -yMax);
     this.ctx.strokeStyle = color;
-    this.ctx.moveTo(pA.x, pA.y);
-    this.ctx.lineTo(pB.x, pB.y);
-
-    this.ctx.closePath();
-    this.ctx.stroke();
-    this.ctx.restore();
   }
-
 }
