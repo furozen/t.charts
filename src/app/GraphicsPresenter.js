@@ -2,14 +2,18 @@ import {createLogger} from "./Logger";
 
 export class GraphicsPresenter{
 
-  constructor(stage, renderer){
+  constructor(renderer){
     this.logger = createLogger('GraphicsPresenter');
     this.yDatas = [];
     this.resetMinMax();
-    this.renderer = renderer;
-    this.stage = stage;
+    this.stage = {
+      width: 1000,
+      height: 1000
+    };
     this.firstXIndex = 0;
     this.lastXindex = undefined;
+
+    this.renderer = renderer;
   }
 
   resetMinMax() {
@@ -18,8 +22,8 @@ export class GraphicsPresenter{
   }
 
   setXCount(xCount){
-    this.xCount = xCount
-    this.lastXindex = xCount.x.length;
+    this.xCount = xCount;
+    this.lastXindex = xCount.x.length -1;
   }
 
   addYData(yData){
