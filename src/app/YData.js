@@ -1,7 +1,5 @@
 export default class YData {
-
   constructor(y, color) {
-
     this.y = y;
     this.color = color;
     this.enabled = true;
@@ -16,10 +14,10 @@ export default class YData {
   }
 
   getMinMaxByIndexes(left, right) {
-    if (!(!!left)) {
+    if (!!!left) {
       left = 0;
     }
-    if (!(!!right)) {
+    if (!!!right) {
       right = this.y.length;
     }
     let min = Number.MAX_SAFE_INTEGER;
@@ -33,6 +31,6 @@ export default class YData {
         max = this.y[i];
       }
     }
-    return {min, max};
+    return { min, max };
   }
 }

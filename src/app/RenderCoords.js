@@ -9,7 +9,11 @@ export default class RenderCoords {
 
     for (let i = 0; i < ycoords.length; i++) {
       let y1 = i * this.step;
-      this.renderer.line({x,y:y1}, {x:w,y:y1},`rgb(0, ${(i*10)%255}, 0)`);
+      this.renderer.line(
+        { x, y: y1 },
+        { x: w, y: y1 },
+        `rgb(0, ${(i * 10) % 255}, 0)`
+      );
     }
     for (let i = 0; i < xcoords.length; i++) {
       let x1 = i * this.step;

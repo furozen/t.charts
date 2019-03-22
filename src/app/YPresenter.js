@@ -1,58 +1,71 @@
 import {createLogger} from "./Logger";
 
-export default class YPresenter{
-  constructor(renderer){
-    this.logger = createLogger('YPresenter');
+export default class YPresenter {
+  constructor(renderer) {
+    this.logger = createLogger("YPresenter");
     this.stage = {
       width: 1000,
       height: 1000
     };
-    this.renderer = renderer;
-    this.renderer.ctx.font = "32px sans-serif";
-    this.color = 0x000022;
     this.steps = 5;
+    this.textX = 40;
+    this.borderLeft = 5;
+    this.textLineWidth = 15;
+    this.textStrokeStyle = "white";
+    this.textFillStyle = "black";
+    this.valueLineStokeStyle = "rgba(220,220,220,0.5)";
+    this.renderer = renderer;
+    this.renderer.font = "32px sans-serif";
+    this.renderer.textBaseline = "middle";
   }
 
-  drawLine(y, value, color){
-    if(!color) {
-      color = 'black';
-    }
-    this.renderer.line({x:0,y},{x:1000,y}, color);
-    this.logger.debug('y:', y, ' value:', value);
+  drawLine(y, value, color) {
+    this.renderer.line(
+      { x: 0, y },
+      { x: this.stage.width, y: y },
+      this.valueLineStokeStyle
+    );
+    this.logger.debug("y:", y, " value:", value);
   }
 
-  drawText(y, value, color) {
-    this.renderer.prepToDraw(color);
-    this.renderer.ctx.scale(1, -1);
-    this.renderer.ctx.fillText(value, 20, -y);
+  drawText(y, value) {
+    this.renderer.line(
+      { x: this.borderLeft, y },
+      { x: this.stage.width, y: y },
+      this.textFillStyle
+    );
+    this.renderer.prepToDraw();
+    this.renderer.strokeStyle = this.textStrokeStyle;
+    this.renderer.lineWidth = this.textLineWidth;
+    this.renderer.fillStyle = this.textFillStyle;
+    this.renderer.scale(1, -1);
+    this.renderer.strokeText(value, this.textX, -y);
+    this.renderer.fillText(value, this.textX, -y);
     this.renderer.finishDraw();
   }
 
-  clear(){
+  clear() {
     this.renderer.clear();
-
   }
 
-  finishDraw(gp){
-    const minY = gp.minY;
-    const maxY = gp.maxY;
-    const steps = this.steps;
-    const yStepValue = (maxY - minY)/ steps;
-    this.drawSteps((minY-yStepValue)<0?0:(minY-yStepValue) , maxY + yStepValue, steps+1, gp );
-    //this.drawSteps(minY, maxY, steps, gp);
+  finishDraw(gp) {
+    const yStepValue = (gp.maxY - gp.minY) / this.steps;
+    const origin = gp.minY - yStepValue;
+    this.drawSteps(
+      origin < 0 ? 0 : origin,
+      gp.maxY + yStepValue,
+      this.steps + 1,
+      gp
+    );
   }
 
   drawSteps(minY, maxY, steps, gp) {
-    this.logger.debug('minY:', minY, ' maxY:', maxY);
+    this.logger.debug("minY:", minY, " maxY:", maxY);
     let step = (maxY - minY) / steps;
     for (let i = 0; i < steps; i++) {
       const value = Math.floor(i * step + minY);
       let y = gp.getYbyValue(value);
-
-      const textColor = 'green';
-      const color = 'gray';
-      this.drawText(y, value, textColor);
-      this.drawLine(y, value, color)
+      this.drawText(y, value);
     }
   }
 }

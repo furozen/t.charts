@@ -1,9 +1,8 @@
-import {createLogger} from "./Logger";
+import { createLogger } from "./Logger";
 
-export class GraphicsPresenter{
-
-  constructor(renderer){
-    this.logger = createLogger('GraphicsPresenter');
+export class GraphicsPresenter {
+  constructor(renderer) {
+    this.logger = createLogger("GraphicsPresenter");
     this.yDatas = [];
     this.resetMinMax();
     this.stage = {
@@ -12,12 +11,10 @@ export class GraphicsPresenter{
     };
     this.firstXIndex = 0;
     this.lastXindex = undefined;
-
     this.renderer = renderer;
-    this.yPresenter;
   }
 
-  setYPresenter(yPresenter){
+  setYPresenter(yPresenter) {
     this.yPresenter = yPresenter;
   }
 
@@ -26,48 +23,56 @@ export class GraphicsPresenter{
     this.maxY = 0;
   }
 
-  setXCount(xCount){
+  setXCount(xCount) {
     this.xCount = xCount;
-    this.lastXindex = xCount.x.length -1;
+    this.lastXindex = xCount.x.length - 1;
   }
 
-  addYData(yData){
+  addYData(yData) {
     this.yDatas.push(yData);
 
-    const gminMaxY = yData.getMinMaxByIndexes(this.firstXIndex, this.lastXindex);
-    this.logger.log('MinMaxY',  gminMaxY);
+    const gminMaxY = yData.getMinMaxByIndexes(
+      this.firstXIndex,
+      this.lastXindex
+    );
+    this.logger.log("MinMaxY", gminMaxY);
     this.minY = Math.min(gminMaxY.min, this.minY);
     this.maxY = Math.max(gminMaxY.max, this.maxY);
   }
 
-  clear(){
+  clear() {
     this.renderer.clear();
-    if(this.yPresenter) {
+    if (this.yPresenter) {
       this.yPresenter.clear();
     }
   }
 
-  draw(firstIndex,lastIndex) {
-    if(isFinite(firstIndex) || isFinite(lastIndex)) {
+  draw(firstIndex, lastIndex) {
+    if (isFinite(firstIndex) || isFinite(lastIndex)) {
       this.setXRange(firstIndex, lastIndex);
     }
-    this.yDatas.forEach( (yData) => {
-      if(yData.enabled) {
+    this.yDatas.forEach(yData => {
+      if (yData.enabled) {
         this.drawGraphic(yData);
       }
     });
-  };
-
+  }
 
   setXRange(firstIndex, lastIndex) {
-    if ((isFinite(firstIndex) && firstIndex !== this.firstXIndex) || (isFinite(lastIndex) && lastIndex !== this.lastXindex)) {
+    if (
+      (isFinite(firstIndex) && firstIndex !== this.firstXIndex) ||
+      (isFinite(lastIndex) && lastIndex !== this.lastXindex)
+    ) {
       this.firstXIndex = firstIndex;
       this.lastXindex = lastIndex;
       this.resetMinMax();
-      this.yDatas.forEach((yData) => {
-        if(yData.enabled) {
-          const gminMaxY = yData.getMinMaxByIndexes(this.firstXIndex, this.lastXindex);
-          this.logger.log('MinMaxY', gminMaxY);
+      this.yDatas.forEach(yData => {
+        if (yData.enabled) {
+          const gminMaxY = yData.getMinMaxByIndexes(
+            this.firstXIndex,
+            this.lastXindex
+          );
+          this.logger.log("MinMaxY", gminMaxY);
           this.minY = Math.min(gminMaxY.min, this.minY);
           this.maxY = Math.max(gminMaxY.max, this.maxY);
         }
@@ -75,11 +80,11 @@ export class GraphicsPresenter{
     }
   }
 
-  getYbyValue(value){
+  getYbyValue(value) {
     return (value - this.minY) * (this.stage.height / (this.maxY - this.minY));
   }
 
-//TODO try Path2D
+  //TODO try Path2D
   drawGraphic(yData) {
     const yRange = this.maxY - this.minY;
     const xRange = this.lastXindex - this.firstXIndex;
@@ -88,22 +93,22 @@ export class GraphicsPresenter{
 
     this.renderer.prepToDraw(yData.color);
     for (let i = this.firstXIndex; i <= this.lastXindex; i++) {
-      let x = (i - this.firstXIndex)  * xMult;
+      let x = (i - this.firstXIndex) * xMult;
       let y = (yData.y[i] - this.minY) * yMult;
       if (i === this.firstXIndex) {
-        this.renderer.moveTo({x, y});
+        this.renderer.moveTo({ x, y });
         this.logger.log(`m x:${x} y:${y}`);
       } else {
-        this.renderer.lineTo({x, y});
+        this.renderer.lineTo({ x, y });
         this.logger.log(`x:${x} y:${y}`);
       }
-      if(this.yPresenter) {
+      if (this.yPresenter) {
         this.yPresenter.drawLine(y, yData.y[i]);
       }
     }
 
     this.renderer.finishDraw();
-    if(this.yPresenter) {
+    if (this.yPresenter) {
       this.yPresenter.finishDraw(this);
     }
   }
