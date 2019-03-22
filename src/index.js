@@ -5,6 +5,7 @@ import RendererCanvas from "./app/RendererCanvas";
 import {GraphicsPresenter} from "./app/GraphicsPresenter";
 import XCounts from "./app/XCounts";
 import YPresenter from "./app/YPresenter";
+import XPresenter from "./app/XPresenter";
 
 
 let context = window || global;
@@ -235,13 +236,15 @@ app.run = () => {
   {
     document.getElementById('gp4').style.display = 'block';
     let ctx2d = app.prepareAndGetCanvas("canvas4");
-
     const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 0, 0);
 
     let ctxY2d = app.prepareAndGetCanvas("yCoords4");
     const rendererY = new RendererCanvas(ctxY2d, ctx2d.canvas.width, ctxY2d.canvas.height, 0, 0);
-
     let yPresenter = new YPresenter(rendererY);
+
+    let ctxX2d = app.prepareAndGetCanvas("xCoords4");
+    const rendererX = new RendererCanvas(ctxX2d, ctxX2d.canvas.width, ctx2d.canvas.height, 0, 0);
+    let xPresenter = new XPresenter(rendererX);
 
 
     let gp = new GraphicsPresenter(renderer);
@@ -258,6 +261,7 @@ app.run = () => {
     //yPresenter.drawSteps((minY-yStepValue)<0?0:(minY-yStepValue) , maxY + yStepValue, steps+1, gp );
 
     gp.setYPresenter(yPresenter);
+    gp.setXPresenter(xPresenter);
 
     const lastIndex = 111;
     let firstIndex = 100;

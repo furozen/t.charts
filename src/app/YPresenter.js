@@ -1,51 +1,20 @@
 import {createLogger} from "./Logger";
+import AbstractCoordPresenter from "./AbstractCoordPresenter";
 
-export default class YPresenter {
+export default class YPresenter extends AbstractCoordPresenter {
+
   constructor(renderer) {
+    super(renderer);
     this.logger = createLogger("YPresenter");
-    this.stage = {
-      width: 1000,
-      height: 1000
-    };
-    this.steps = 5;
-    this.textX = 40;
-    this.borderLeft = 5;
-    this.textLineWidth = 15;
-    this.textStrokeStyle = "white";
-    this.textFillStyle = "black";
-    this.valueLineStokeStyle = "rgba(220,220,220,0.5)";
-    this.renderer = renderer;
-    this.renderer.font = "32px sans-serif";
-    this.renderer.textBaseline = "middle";
   }
 
-  drawLine(y, value, color) {
-    this.renderer.line(
-      { x: 0, y },
-      { x: this.stage.width, y: y },
-      this.valueLineStokeStyle
-    );
+  drawLine(y, value) {
+    this._drawLine(0, y, this.stage.width, y);
     this.logger.debug("y:", y, " value:", value);
   }
 
   drawText(y, value) {
-    this.renderer.line(
-      { x: this.borderLeft, y },
-      { x: this.stage.width, y: y },
-      this.textFillStyle
-    );
-    this.renderer.prepToDraw();
-    this.renderer.strokeStyle = this.textStrokeStyle;
-    this.renderer.lineWidth = this.textLineWidth;
-    this.renderer.fillStyle = this.textFillStyle;
-    this.renderer.scale(1, -1);
-    this.renderer.strokeText(value, this.textX, -y);
-    this.renderer.fillText(value, this.textX, -y);
-    this.renderer.finishDraw();
-  }
-
-  clear() {
-    this.renderer.clear();
+    this._drawText(this.borderLeft, y, this.stage.width, y, value, this.textX, -y);
   }
 
   finishDraw(gp) {
@@ -68,4 +37,5 @@ export default class YPresenter {
       this.drawText(y, value);
     }
   }
+
 }

@@ -18,6 +18,10 @@ export class GraphicsPresenter {
     this.yPresenter = yPresenter;
   }
 
+  setXPresenter(xPresenter) {
+    this.xPresenter = xPresenter;
+  }
+
   resetMinMax() {
     this.minY = Number.MAX_SAFE_INTEGER;
     this.maxY = 0;
@@ -44,6 +48,9 @@ export class GraphicsPresenter {
     this.renderer.clear();
     if (this.yPresenter) {
       this.yPresenter.clear();
+    }
+    if (this.xPresenter) {
+      this.xPresenter.clear();
     }
   }
 
@@ -84,6 +91,15 @@ export class GraphicsPresenter {
     return (value - this.minY) * (this.stage.height / (this.maxY - this.minY));
   }
 
+  getXbyIndex(index) {
+    const xRange = this.lastXindex - this.firstXIndex;
+    const xMult = this.stage.width / xRange;
+    let x = (index - this.firstXIndex) * xMult;
+    return x;
+  }
+
+
+
   //TODO try Path2D
   drawGraphic(yData) {
     const yRange = this.maxY - this.minY;
@@ -105,11 +121,17 @@ export class GraphicsPresenter {
       if (this.yPresenter) {
         this.yPresenter.drawLine(y, yData.y[i]);
       }
+      if (this.xPresenter) {
+        this.xPresenter.drawLine(x, this.xCount.x[i]);
+      }
     }
 
     this.renderer.finishDraw();
     if (this.yPresenter) {
       this.yPresenter.finishDraw(this);
+    }
+    if (this.xPresenter) {
+      this.xPresenter.finishDraw(this);
     }
   }
 }
