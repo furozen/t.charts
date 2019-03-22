@@ -97,9 +97,9 @@ export class GraphicsPresenter{
         this.renderer.lineTo({x, y});
         this.logger.log(`x:${x} y:${y}`);
       }
-      // if(this.yPresenter) {
-      //   this.yPresenter.draw(y, yData.y[i]);
-      // }
+      if(this.yPresenter) {
+        this.yPresenter.drawLine(y, yData.y[i]);
+      }
     }
 
     this.renderer.finishDraw();

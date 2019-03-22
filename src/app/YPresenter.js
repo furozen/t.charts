@@ -8,35 +8,51 @@ export default class YPresenter{
       height: 1000
     };
     this.renderer = renderer;
-    this.renderer.ctx.font = "32px serif";
+    this.renderer.ctx.font = "32px sans-serif";
     this.color = 0x000022;
     this.steps = 5;
   }
 
-  draw(y, value, color){
+  drawLine(y, value, color){
     if(!color) {
       color = 'black';
     }
     this.renderer.line({x:0,y},{x:1000,y}, color);
+    this.logger.debug('y:', y, ' value:', value);
+  }
+
+  drawText(y, value, color) {
     this.renderer.prepToDraw(color);
     this.renderer.ctx.scale(1, -1);
     this.renderer.ctx.fillText(value, 20, -y);
     this.renderer.finishDraw();
-    this.logger.debug('y:', y, ' value:', value);
-    //this.renderer.fillText(value, 20, y)
   }
 
   clear(){
     this.renderer.clear();
+
   }
 
   finishDraw(gp){
-    this.logger.debug('minY:', gp.minY, ' maxY:', gp.maxY);
-    let step = (gp.maxY - gp.minY) / this.steps ;
-    for( let i=0; i < this.steps; i++ ){
-      const value = Math.floor(i * step) + gp.minY;
+    const minY = gp.minY;
+    const maxY = gp.maxY;
+    const steps = this.steps;
+    const yStepValue = (maxY - minY)/ steps;
+    this.drawSteps((minY-yStepValue)<0?0:(minY-yStepValue) , maxY + yStepValue, steps+1, gp );
+    //this.drawSteps(minY, maxY, steps, gp);
+  }
+
+  drawSteps(minY, maxY, steps, gp) {
+    this.logger.debug('minY:', minY, ' maxY:', maxY);
+    let step = (maxY - minY) / steps;
+    for (let i = 0; i < steps; i++) {
+      const value = Math.floor(i * step + minY);
       let y = gp.getYbyValue(value);
-      this.draw(y, value, 'green');
+
+      const textColor = 'green';
+      const color = 'gray';
+      this.drawText(y, value, textColor);
+      this.drawLine(y, value, color)
     }
   }
 }

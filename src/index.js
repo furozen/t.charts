@@ -88,13 +88,13 @@ app.run = () => {
 
 
     const renderCoord = new RenderCoords(renderer, step);
-    renderCoord.draw(0, 0, stage.width, stage.height, xcoords, ycoords);
+    renderCoord.drawLine(0, 0, stage.width, stage.height, xcoords, ycoords);
 
 
     const xMult = stage.width / xColumn.length;
     const yMult = stage.height / yRange;
 
-    let draw = function (xCounts, yData, color) {
+    let drawLine = function (xCounts, yData, color) {
       let x0, y0;
       for (let i = 0; i < xCounts.x.length; i++) {
         if (x0 === undefined) {
@@ -111,10 +111,10 @@ app.run = () => {
 
       }
     };
-    draw(xCounts, yData1, 'red');
-    draw(xCounts, yData2, 'blue');
+    drawLine(xCounts, yData1, 'red');
+    drawLine(xCounts, yData2, 'blue');
 
-    {  //draw packman
+    {  //drawLine packman
       ctx2d.beginPath();
       ctx2d.arc(57, 57, 13, Math.PI / 7, -Math.PI / 7, false);
       ctx2d.lineTo(51, 57);
@@ -182,19 +182,29 @@ app.run = () => {
 
   {
     let ctx2d = app.prepareAndGetCanvas("canvas3");
-    const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 0, 0);
+
+    const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 0, -50);
 
 
     let ctxY2d = app.prepareAndGetCanvas("yCoords");
-    const rendererY = new RendererCanvas(ctxY2d, ctx2d.canvas.width, ctxY2d.canvas.height, 0, 0);
+    const rendererY = new RendererCanvas(ctxY2d, ctx2d.canvas.width, ctxY2d.canvas.height, 0, -50);
 
     let yPresenter = new YPresenter(rendererY);
 
 
     let gp = new GraphicsPresenter(renderer);
+    gp.stage ={ width:1000, height:900}
     gp.setXCount(xCounts);
-    //gp.addYData(yData1);
+    gp.addYData(yData1);
     gp.addYData(yData2);
+
+    const minY = gp.minY;
+    const maxY = gp.maxY;
+    const steps = 5;
+    const yStepValue = (maxY - minY)/ steps;
+
+    //yPresenter.drawSteps((minY-yStepValue)<0?0:(minY-yStepValue) , maxY + yStepValue, steps+1, gp );
+
     gp.setYPresenter(yPresenter);
 
     const lastIndex = 111;
