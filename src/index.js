@@ -198,14 +198,14 @@ app.run = () => {
     gp.setYPresenter(yPresenter);
 
     const lastIndex = 111;
-    let firstIndex = 100;
+    let firstIndex = 0;
     const maxFirstIndex = 100;
 
     const update = () => {
       gp.clear();
       gp.setXRange(firstIndex, lastIndex);
       gp.draw();
-/*      let tm = setTimeout(() => {
+      let tm = setTimeout(() => {
         requestAnimationFrame(() => {
           if (firstIndex <= maxFirstIndex) {
             update();
@@ -216,7 +216,7 @@ app.run = () => {
           }
           clearTimeout(tm);
         })
-      }, 0);*/
+      }, 20);
     };
     update();
 

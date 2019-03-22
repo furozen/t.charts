@@ -9,17 +9,19 @@ export default class YPresenter{
     };
     this.renderer = renderer;
     this.renderer.ctx.font = "32px serif";
-    //this.renderer.ctx.textBaseline = "hanging";
     this.color = 0x000022;
+    this.steps = 5;
   }
 
-  draw(y, value){
-    this.renderer.line({x:0,y},{x:1000,y},this.color);
-    this.color += 0x000022;
-    this.renderer.prepToDraw('black');
+  draw(y, value, color){
+    if(!color) {
+      color = 'black';
+    }
+    this.renderer.line({x:0,y},{x:1000,y}, color);
+    this.renderer.prepToDraw(color);
     this.renderer.ctx.scale(1, -1);
     this.renderer.ctx.fillText(value, 20, -y);
-
+    this.renderer.finishDraw();
     this.logger.debug('y:', y, ' value:', value);
     //this.renderer.fillText(value, 20, y)
   }
@@ -30,6 +32,11 @@ export default class YPresenter{
 
   finishDraw(gp){
     this.logger.debug('minY:', gp.minY, ' maxY:', gp.maxY);
-
+    let step = (gp.maxY - gp.minY) / this.steps ;
+    for( let i=0; i < this.steps; i++ ){
+      const value = Math.floor(i * step) + gp.minY;
+      let y = gp.getYbyValue(value);
+      this.draw(y, value, 'green');
+    }
   }
 }

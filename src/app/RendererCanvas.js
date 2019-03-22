@@ -13,7 +13,6 @@ export default class RendererCanvas {
     this.d = height / yMax;
     this.tx = anchorX * width/ xMax;
     this.ty = anchorY * height / yMax;
-    //this.ctx.setTransform(this.a, this.b, this.c, -1 * this.d, this.tx, this.ty);
   }
 
   clear(){
@@ -50,13 +49,4 @@ export default class RendererCanvas {
     this.ctx.strokeStyle = color;
   }
 
-  fillText(text, x, y) {
-    this.ctx.resetTransform();
-    this.ctx.save();
-    this.ctx.transform(this.a, this.b, this.c, -1 * this.d, this.tx, this.ty);
-    this.ctx.translate(0, -yMax);
-    this.ctx.fillText(text, x, y);
-    this.ctx.fill();
-    this.ctx.restore();
-  }
 }

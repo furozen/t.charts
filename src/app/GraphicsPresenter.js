@@ -74,9 +74,13 @@ export class GraphicsPresenter{
       });
     }
   }
+
+  getYbyValue(value){
+    return (value - this.minY) * (this.stage.height / (this.maxY - this.minY));
+  }
+
 //TODO try Path2D
   drawGraphic(yData) {
-    let x0, y0;
     const yRange = this.maxY - this.minY;
     const xRange = this.lastXindex - this.firstXIndex;
     const xMult = this.stage.width / xRange;
@@ -93,9 +97,9 @@ export class GraphicsPresenter{
         this.renderer.lineTo({x, y});
         this.logger.log(`x:${x} y:${y}`);
       }
-      if(this.yPresenter) {
-        this.yPresenter.draw(y, yData.y[i]);
-      }
+      // if(this.yPresenter) {
+      //   this.yPresenter.draw(y, yData.y[i]);
+      // }
     }
 
     this.renderer.finishDraw();
