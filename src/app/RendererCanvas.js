@@ -11,15 +11,9 @@ export default class RendererCanvas {
     this.b = 0;
     this.c = 0;
     this.d = height / yMax;
-    this.tx = anchorX;
-    this.ty = anchorY;
-  }
-
-  transform(p) {
-    const x = this.a * p.x + this.c * p.y + this.tx;
-    const y = this.b * p.x + this.d * p.y + this.ty;
-    //this.ctx.setTransform(this.a, this.b, this.c, this.d, this.tx, this.ty);
-    return {x, y};
+    this.tx = anchorX * width/ xMax;
+    this.ty = anchorY * height / yMax;
+    //this.ctx.setTransform(this.a, this.b, this.c, -1 * this.d, this.tx, this.ty);
   }
 
   clear(){
@@ -35,6 +29,7 @@ export default class RendererCanvas {
 
   lineTo(pB) {
     this.ctx.lineTo(pB.x, pB.y);
+
   }
 
   moveTo(pA) {
@@ -53,5 +48,15 @@ export default class RendererCanvas {
     this.ctx.transform(this.a, this.b, this.c, -1 * this.d, this.tx, this.ty);
     this.ctx.translate(0, -yMax);
     this.ctx.strokeStyle = color;
+  }
+
+  fillText(text, x, y) {
+    this.ctx.resetTransform();
+    this.ctx.save();
+    this.ctx.transform(this.a, this.b, this.c, -1 * this.d, this.tx, this.ty);
+    this.ctx.translate(0, -yMax);
+    this.ctx.fillText(text, x, y);
+    this.ctx.fill();
+    this.ctx.restore();
   }
 }

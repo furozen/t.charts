@@ -2,19 +2,16 @@
     <head>
         <script src="./app.bundle.js"></script>
         <style>
-            canvas#canvas {
-                border:1px solid #000;
-                width:100%;
-                height:300px;
+            .test2dCanvasBorders {
+                border: 1px solid #F00;
             }
-            canvas#canvas2 {
+            .test2dCanvas{
                 border:1px solid #eee;
                 width:100%;
                 height:300px;
+                display: none;
             }
             canvas#canvasNarrowLong {
-                border:1px solid #eee;
-                width:100%;
                 height:80px;
             }
         </style>
@@ -26,9 +23,14 @@
     </head>
     <body >
 
-        <canvas id="canvas"></canvas>
-        <canvas id="canvas2"></canvas>
-        <canvas id="canvasNarrowLong"></canvas>
+        <canvas id="canvas" class="test2dCanvas"></canvas>
+        <canvas id="canvas2" class="test2dCanvas"></canvas>
+        <canvas id="canvasNarrowLong" class="test2dCanvas"></canvas>
+        <div style="position:relative; display: block; height: 350px" class="test2dCanvasBorders">
+            <canvas id="canvas3" class="test2dCanvasBorders" style="width: 90%; height: 300px; position: absolute; left:10%; top:0px"></canvas>
+            <canvas id="xCoords" class="test2dCanvasBorders" style="width: 90%; height: 50px; position: absolute; left:10%; top:300px"></canvas>
+            <canvas id="yCoords" class="test2dCanvasBorders" style="height: 300px; width: 10%; position: absolute; left:0px; top:0px"></canvas>
+        </div>
 
     </body>
 </html>

@@ -4,6 +4,7 @@ import RenderCoords from "./app/RenderCoords";
 import RendererCanvas from "./app/RendererCanvas";
 import {GraphicsPresenter} from "./app/GraphicsPresenter";
 import XCounts from "./app/XCounts";
+import YPresenter from "./app/YPresenter";
 
 
 let context = window || global;
@@ -18,6 +19,7 @@ app.prepareAndGetCanvas = function (elementId) {
   let canvas = document.getElementById(elementId);
   let ctx2d = canvas.getContext('2d');
   ctx2d.resetTransform();
+  canvas.style.display ='block';
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
 
@@ -47,7 +49,7 @@ app.run = () => {
   console.log('g2', yColumn2.length, yColumn2);
   console.log('g2', yData2.getMinMaxByIndexes(10, 102));
 
-  {
+ /* {
     let ctx2d = app.prepareAndGetCanvas("canvas");
 
     const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 0, 0);
@@ -118,21 +120,21 @@ app.run = () => {
       ctx2d.lineTo(51, 57);
       ctx2d.fill();
     }
-  }
+  }*/
 
 
 
   {
     let ctx2d = app.prepareAndGetCanvas("canvas2");
-    const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 0, 0);
+    const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 50, -500);
 
     let gp = new GraphicsPresenter(renderer);
-
+    gp.stage ={ width:950, height:500}
     gp.setXCount(xCounts);
     gp.addYData(yData1);
     gp.addYData(yData2);
 
-    const lastIndex = 111;
+    const lastIndex = xCounts.length-1;
     let firstIndex = 0;
     const maxFirstIndex = 100;
 
@@ -140,7 +142,7 @@ app.run = () => {
       gp.clear();
       gp.setXRange(firstIndex, lastIndex);
       gp.draw();
-      let tm = setTimeout(() => {
+/*      let tm = setTimeout(() => {
         requestAnimationFrame(() => {
           if (firstIndex <= maxFirstIndex) {
             update();
@@ -151,7 +153,7 @@ app.run = () => {
           }
           clearTimeout(tm);
         })
-      }, 0);
+      }, 0);*/
     };
     update();
 
@@ -168,13 +170,55 @@ app.run = () => {
     gp.addYData(yData1);
     gp.addYData(yData2);
 
-    const lastIndex = 111;
+    const lastIndex = xCounts.length-1;
     let firstIndex = 0;
 
     gp.clear();
     //gp.setXRange(firstIndex, lastIndex);
     gp.draw();
 
+
+  }
+
+  {
+    let ctx2d = app.prepareAndGetCanvas("canvas3");
+    const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 0, 0);
+
+
+    let ctxY2d = app.prepareAndGetCanvas("yCoords");
+    const rendererY = new RendererCanvas(ctxY2d, ctx2d.canvas.width, ctxY2d.canvas.height, 0, 0);
+
+    let yPresenter = new YPresenter(rendererY);
+
+
+    let gp = new GraphicsPresenter(renderer);
+    gp.setXCount(xCounts);
+    //gp.addYData(yData1);
+    gp.addYData(yData2);
+    gp.setYPresenter(yPresenter);
+
+    const lastIndex = 111;
+    let firstIndex = 100;
+    const maxFirstIndex = 100;
+
+    const update = () => {
+      gp.clear();
+      gp.setXRange(firstIndex, lastIndex);
+      gp.draw();
+/*      let tm = setTimeout(() => {
+        requestAnimationFrame(() => {
+          if (firstIndex <= maxFirstIndex) {
+            update();
+          }
+          firstIndex += 5;
+          if (firstIndex > 50) {
+            yData1.disable();
+          }
+          clearTimeout(tm);
+        })
+      }, 0);*/
+    };
+    update();
 
   }
 
