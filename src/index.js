@@ -41,14 +41,25 @@ app.run = () => {
   console.log(xColumn.length, xColumn);
   console.log(yColumn.length, yColumn);
 
+
+  let xColumn4 = graphic_data[4]['columns'][0].slice(1);
+  let yColumn40 = graphic_data[4]['columns'][1].slice(1);
+  let yColumn41 = graphic_data[4]['columns'][2].slice(1);
+  let yColumn42 = graphic_data[4]['columns'][3].slice(1);
+  let yColumn43 = graphic_data[4]['columns'][4].slice(1);
+
   let xCounts = new XCounts(xColumn);
   let yData1 = new YData(yColumn, 'cyan');
-
-  console.log(yData1.getMinMaxByIndexes(10, 102));
-
   let yData2 = new YData(yColumn2, 'orange');
   console.log('g2', yColumn2.length, yColumn2);
   console.log('g2', yData2.getMinMaxByIndexes(10, 102));
+  console.log(yData1.getMinMaxByIndexes(10, 102));
+
+  let xCounts4 = new XCounts(xColumn4);
+  let yData40 = new YData(yColumn40, 'cyan');
+  let yData41 = new YData(yColumn41, 'green');
+  let yData42 = new YData(yColumn42, 'red');
+  let yData43 = new YData(yColumn43, 'blue');
 
   /* {
      let ctx2d = app.prepareAndGetCanvas("canvas");
@@ -180,17 +191,19 @@ app.run = () => {
 
   }
 
-  /* {
+   {
      document.getElementById('gp3').style.display = 'block';
      let ctx2d = app.prepareAndGetCanvas("canvas3");
 
      const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 0, -50);
 
-
      let ctxY2d = app.prepareAndGetCanvas("yCoords3");
      const rendererY = new RendererCanvas(ctxY2d, ctx2d.canvas.width, ctxY2d.canvas.height, 0, -50);
-
      let yPresenter = new YPresenter(rendererY);
+
+     let ctxX2d = app.prepareAndGetCanvas("xCoords3");
+     const rendererX = new RendererCanvas(ctxX2d, ctxX2d.canvas.width, ctx2d.canvas.height, 0, 0);
+     let xPresenter = new XPresenter(rendererX);
 
 
      let gp = new GraphicsPresenter(renderer);
@@ -207,6 +220,7 @@ app.run = () => {
      //yPresenter.drawSteps((minY-yStepValue)<0?0:(minY-yStepValue) , maxY + yStepValue, steps+1, gp );
 
      gp.setYPresenter(yPresenter);
+     gp.setXPresenter(xPresenter);
 
      const lastIndex = 111;
      let firstIndex = 0;
@@ -231,7 +245,7 @@ app.run = () => {
      };
      update();
 
-   }*/
+   }
 
   {
     document.getElementById('gp4').style.display = 'block';
@@ -249,9 +263,11 @@ app.run = () => {
 
     let gp = new GraphicsPresenter(renderer);
     gp.stage = {width: 1000, height: 900}
-    gp.setXCount(xCounts);
-    //gp.addYData(yData1);
-    gp.addYData(yData2);
+    gp.setXCount(xCounts4);
+    gp.addYData(yData40);
+    gp.addYData(yData41);
+    gp.addYData(yData42);
+    gp.addYData(yData43);
 
     const minY = gp.minY;
     const maxY = gp.maxY;
@@ -273,6 +289,8 @@ app.run = () => {
 
 
   }
+
+//TODO coordinate lines should not scale
 
 
   /*let scene = new Scene(ctx, stage);
