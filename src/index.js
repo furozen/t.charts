@@ -46,8 +46,6 @@ app.createPlayground = (index) =>{
   }
   const fragment = document.createDocumentFragment();
 
-
-
   const prepareAndGetCtx2d = function (canvas ) {
     let ctx2d = canvas.getContext('2d');
     ctx2d.resetTransform();
@@ -59,11 +57,10 @@ app.createPlayground = (index) =>{
   const descriptionDiv = createElemenet('description', 'div', fragment);
   descriptionDiv.appendChild( document.createTextNode(` graphic data #${index}`));
 
-
-
   const graphCanvas = createElemenet('graphCanvas','canvas', fragment);
   const xCoordCanvas = createElemenet('xCoordCanvas', 'canvas', fragment);
   const yCoordCanvas = createElemenet('yCoordCanvas', 'canvas', fragment);
+  const narrowGraphCanvas = createElemenet('narrowGraphCanvas','canvas', fragment);
 
   playground.appendChild(fragment);
 
@@ -71,6 +68,10 @@ app.createPlayground = (index) =>{
     graphCanvas:{
       canvas:graphCanvas,
       ctx2d:prepareAndGetCtx2d(graphCanvas)
+    },
+    narrowGraphCanvas:{
+      canvas:narrowGraphCanvas,
+      ctx2d:prepareAndGetCtx2d(narrowGraphCanvas)
     },
     xCoordCanvas:{
       canvas:xCoordCanvas,
@@ -136,30 +137,38 @@ app.showGraphic = (index) => {
     }
   });
 
-
-
   gp.setXCount(preparedData['XCount']);
   preparedData.graphs.forEach( (yData) => {
     gp.addYData(yData);
   });
 
-
-  const minY = gp.minY;
-  const maxY = gp.maxY;
-  const steps = 5;
-  const yStepValue = (maxY - minY) / steps;
-
-
   gp.setYPresenter(yPresenter);
   gp.setXPresenter(xPresenter);
 
-  const lastIndex = 111;
+  let lastIndex = gp.lastXindex;
   let firstIndex = 0;
-  const maxFirstIndex = 100;
 
   gp.clear();
   gp.setXRange(firstIndex, lastIndex);
   gp.draw();
+
+  //narrow graph
+  {
+
+    const ctx2d = p.narrowGraphCanvas.ctx2d;
+    const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 0, 0);
+
+    let gp = app.narrowGP = new GraphicsPresenter(renderer);
+
+    gp.setXCount(preparedData['XCount']);
+    preparedData.graphs.forEach( (yData) => {
+      gp.addYData(yData);
+    });
+
+    gp.clear();
+    gp.draw();
+
+  }
 
 };
 
@@ -171,10 +180,13 @@ app.handleTrigger = (event) => {
   if(index!== undefined){
     if(element.classList.value.indexOf('on') !== -1){
       app.gp.yDatas[index].enable();
+      app.narrowGP.yDatas[index].enable();
     } else {
       app.gp.yDatas[index].disable();
+      app.narrowGP.yDatas[index].disable();
     }
     app.gp.redraw();
+    app.narrowGP.redraw();
   }
 }
 
@@ -290,7 +302,7 @@ app.run = () => {
      }
    }*/
 
-
+/*
   {
     let ctx2d = app.prepareAndGetCanvas("canvas2");
     const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 50, -500);
@@ -309,7 +321,7 @@ app.run = () => {
       gp.clear();
       gp.setXRange(firstIndex, lastIndex);
       gp.draw();
-      /*      let tm = setTimeout(() => {
+      /!*      let tm = setTimeout(() => {
               requestAnimationFrame(() => {
                 if (firstIndex <= maxFirstIndex) {
                   update();
@@ -320,11 +332,11 @@ app.run = () => {
                 }
                 clearTimeout(tm);
               })
-            }, 0);*/
+            }, 0);*!/
     };
     update();
 
-  }
+  }*/
 
   {
 
@@ -347,7 +359,7 @@ app.run = () => {
 
   }
 
-   {
+   /*{
      document.getElementById('gp3').style.display = 'block';
      let ctx2d = app.prepareAndGetCanvas("canvas3");
 
@@ -401,9 +413,9 @@ app.run = () => {
      };
      update();
 
-   }
+   }*/
 
-  {
+  /*{
     document.getElementById('gp4').style.display = 'block';
     let ctx2d = app.prepareAndGetCanvas("canvas4");
     const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 0, 0);
@@ -444,13 +456,10 @@ app.run = () => {
     gp.draw();
 
 
-  }
-
-//TODO coordinate lines should not scale
+  }*/
 
 
-  /*let scene = new Scene(ctx, stage);
-  scene.update();*/
+
 }
 
 export default app;

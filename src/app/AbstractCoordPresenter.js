@@ -42,7 +42,7 @@ export default class AbstractCoordPresenter {
 
     this.renderer.scale(1 * this.renderer.a, -1);
     this.renderer.strokeText(value, textX / this.renderer.a, textY);
-    this.renderer.fillText(value, textX / this.renderer.a, textY - 25);
+    this.renderer.fillText(value, textX / this.renderer.a, textY);
 
     this.renderer.finishDraw();
   }
