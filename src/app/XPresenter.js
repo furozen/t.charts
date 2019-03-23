@@ -13,7 +13,7 @@ export default class XPresenter extends AbstractCoordPresenter {
 
   drawLine(x, value) {
     this._drawLine(x, 0, x, this.stage.height);
-    this.logger.debug("x:", x, " value:", value);
+    this.logger.verbose("x:", x, " value:", value);
   }
 
   drawText(x, value) {
@@ -36,21 +36,13 @@ export default class XPresenter extends AbstractCoordPresenter {
 
       fDate = new Date(gp.xCount.x[i]);
       fText = dateTimeFormat.format(fDate);
-      this.logger.debug("fDate:", fDate, " fText:", fText);
       let x = gp.getXbyIndex(i);
       this.drawText(x, fText);
       i += step;
     }
 
-    this.logger.debug("fDate:", fDate, " fText:", fText, " textMeasure", textMeasure);
-    /* const yStepValue = (gp.maxY - gp.minY) / this.steps;
-     const origin = gp.minY - yStepValue;
-     this.drawSteps(
-         origin < 0 ? 0 : origin,
-         gp.maxY + yStepValue,
-         this.steps + 1,
-         gp
-     );*/
+    this.logger.verbose("fDate:", fDate, " fText:", fText, " textMeasure", textMeasure);
+
   }
 
 }

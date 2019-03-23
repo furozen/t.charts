@@ -6,7 +6,7 @@ import {GraphicsPresenter} from "./app/GraphicsPresenter";
 import XCounts from "./app/XCounts";
 import YPresenter from "./app/YPresenter";
 import XPresenter from "./app/XPresenter";
-import {createLogger} from "./app/Logger";
+import {createLogger, LoggerSetting, LogLevel} from "./app/Logger";
 
 
 let context = window || global;
@@ -15,6 +15,7 @@ let app = context.app;
 if (!app) {
   app = context.app = {};
   app.logger = createLogger('app');
+  LoggerSetting.logLevel = 'debug';
 }
 
 
