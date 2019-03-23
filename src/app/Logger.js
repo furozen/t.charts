@@ -1,6 +1,6 @@
 export const createLogger = context => {
   const next = level => (...args) =>
-    console[level](...[...[context + "::"], ...args]);
+      console[level](...[...[context + "::"], ...args]);
   const getNextOrNoop = level => next(level);
 
   const loggerInstance = {
@@ -11,6 +11,5 @@ export const createLogger = context => {
     warn: getNextOrNoop("warn"),
     verbose: getNextOrNoop("info")
   };
-
   return loggerInstance;
 };
