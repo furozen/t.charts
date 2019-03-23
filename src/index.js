@@ -6,6 +6,7 @@ import {GraphicsPresenter} from "./app/GraphicsPresenter";
 import XCounts from "./app/XCounts";
 import YPresenter from "./app/YPresenter";
 import XPresenter from "./app/XPresenter";
+import {createLogger} from "./app/Logger";
 
 
 let context = window || global;
@@ -13,6 +14,7 @@ let context = window || global;
 let app = context.app;
 if (!app) {
   app = context.app = {};
+  app.logger = createLogger('app');
 }
 
 
@@ -26,6 +28,119 @@ app.prepareAndGetCanvas = function (elementId) {
 
   return ctx2d;
 };
+app.grapicsData = graphic_data;
+
+app.createPlayground = (index) =>{
+  const playground = document.getElementById('playground');
+  while (playground.firstChild) {
+    playground.removeChild(playground.firstChild);
+  }
+  const fragment = document.createDocumentFragment();
+
+  const createElemenet = function (className, tagName = 'canvas') {
+    const element = document.createElement(tagName);
+    let a = document.createAttribute('class');
+    a.value = className;
+    element.setAttributeNode(a);
+    fragment.appendChild(element);
+    return element;
+  };
+
+  const prepareAndGetCtx2d = function (canvas ) {
+    let ctx2d = canvas.getContext('2d');
+    ctx2d.resetTransform();
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    return ctx2d;
+  };
+
+  const descriptionDiv = createElemenet('description', 'div');
+  descriptionDiv.appendChild( document.createTextNode(` graphic data #${index}`));
+
+  const graphCanvas = createElemenet('graphCanvas');
+  const xCoordCanvas = createElemenet('xCoordCanvas');
+  const yCoordCanvas = createElemenet('yCoordCanvas');
+
+  playground.appendChild(fragment);
+
+  return {
+    graphCanvas:{
+      canvas:graphCanvas,
+      ctx2d:prepareAndGetCtx2d(graphCanvas)
+    },
+    xCoordCanvas:{
+      canvas:xCoordCanvas,
+      ctx2d:prepareAndGetCtx2d(xCoordCanvas)
+    },
+    yCoordCanvas:{
+      canvas:yCoordCanvas,
+      ctx2d:prepareAndGetCtx2d(yCoordCanvas)
+    },
+  };
+
+};
+
+
+app.showGraphic = (index) => {
+  const p = app.createPlayground(index);
+
+
+  const renderer = new RendererCanvas(p.graphCanvas.ctx2d, p.graphCanvas.ctx2d.canvas.width, p.graphCanvas.ctx2d.canvas.height, 0, 0);
+  const rendererY = new RendererCanvas(p.yCoordCanvas.ctx2d, p.graphCanvas.ctx2d.canvas.width, p.yCoordCanvas.ctx2d.canvas.height, 0, 0);
+  const rendererX = new RendererCanvas(p.xCoordCanvas.ctx2d, p.xCoordCanvas.ctx2d.canvas.width, p.graphCanvas.canvas.height, 0, 0);
+
+  let yPresenter = new YPresenter(rendererY);
+  let xPresenter = new XPresenter(rendererX);
+
+  let gp = new GraphicsPresenter(renderer);
+  gp.stage = {width: 1000, height: 900};
+
+  const graphicDatum = graphic_data[index];
+
+  const preparedData = {'graphs':[]};
+  graphicDatum['columns'].forEach( (column, i) => {
+    const name = column[0];
+    const data = column.slice(1);
+    const type = graphicDatum['types'][name];
+    switch (type) {
+      case 'x':
+        preparedData['XCount'] = new XCounts(data);
+        break;
+      case 'line':
+        preparedData['graphs'].push(new YData(data, graphicDatum['colors'][name], graphicDatum['names'][name]));
+        break;
+      default:
+        this.logger.warn(` found unsupport type '${type}' for graph data#${index}`);
+        break;
+    }
+  });
+
+
+
+  gp.setXCount(preparedData['XCount']);
+  preparedData.graphs.forEach( (yData) => {
+    gp.addYData(yData);
+  });
+
+
+  const minY = gp.minY;
+  const maxY = gp.maxY;
+  const steps = 5;
+  const yStepValue = (maxY - minY) / steps;
+
+
+  gp.setYPresenter(yPresenter);
+  gp.setXPresenter(xPresenter);
+
+  const lastIndex = 111;
+  let firstIndex = 0;
+  const maxFirstIndex = 100;
+
+  gp.clear();
+  gp.setXRange(firstIndex, lastIndex);
+  gp.draw();
+
+};
 
 app.run = () => {
   let requestAnimationFrame = window.requestAnimationFrame ||
@@ -34,6 +149,11 @@ app.run = () => {
       window.msRequestAnimationFrame;
 
   window.requestAnimationFrame = requestAnimationFrame;
+
+
+  for(let i = 0; i < graphic_data.length; i++) {
+
+  }
 
   let xColumn = graphic_data[0]['columns'][0].slice(1);
   let yColumn = graphic_data[0]['columns'][1].slice(1);

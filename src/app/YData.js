@@ -1,8 +1,9 @@
 export default class YData {
-  constructor(y, color) {
+  constructor(y, color, name) {
     this.y = y;
     this.color = color;
     this.enabled = true;
+    this.name = name;
   }
 
   disable() {

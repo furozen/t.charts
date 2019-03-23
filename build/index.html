@@ -17,11 +17,77 @@
         </style>
         <script>
             window.addEventListener('load', () => {
-              app.run();
+              //app.run();
+              const selector = document.getElementById('selector');
+              const fragment = document.createDocumentFragment();
+              app.grapicsData.forEach((data, index)=>{
+                /*"names": {
+      "y0": "#0",
+      "y1": "#1",
+      "y2": "#2",
+      "y3": "#3"
+    },
+    "colors": {
+      "y0": "#cb513a",
+      "y1": "#73c03a",
+      "y2": "#65b9ac",
+      "y3": "#4682b4"
+    }*/
+                let text=`#${index+1} - ${Object.keys(data.names).length} graphs`;
+                let option = document.createElement('option');
+                option.value = index;
+                option.appendChild( document.createTextNode(text));
+                fragment.appendChild(option);
+              });
+              selector.appendChild(fragment);
             })
         </script>
     </head>
+    <style>
+        .playground {
+            position:relative;
+            height: 500px;
+            width: 100%;
+            border: 1px solid lightgray;
+        }
+        .playground canvas.graphCanvas{
+            width: 90%;
+            height: 300px;
+            position: absolute;
+            left:10%;
+            top:0px;
+            border: 1px solid lawngreen;
+        }
+        .playground canvas.xCoordCanvas{
+            width: 90%;
+            height: 50px;
+            position: absolute;
+            left:10%;
+            top:300px;
+            border: 1px solid lavender;
+        }
+        .playground canvas.yCoordCanvas{
+            height: 300px;
+            width: 10%;
+            position: absolute;
+            left:0px;
+            top:0px;
+            border: 1px solid lightblue;
+        }
+        .playground div.description{
+            position: absolute;
+            left:0px;
+            top:400px;
+            border: 1px solid lightblue;
+        }
+
+    </style>
     <body >
+       <select id="selector" onchange="app.showGraphic(this.value)" onselect="app.showGraphic(this.value)">
+       </select>
+       <div id="playground" class="playground">
+
+       </div>
 
         <canvas id="canvas" class="test2dCanvas"></canvas>
         <canvas id="canvas2" class="test2dCanvas"></canvas>

@@ -28,7 +28,7 @@ export default class XPresenter extends AbstractCoordPresenter {
     let fText = dateTimeFormat.format(fDate);
     const textMeasure = this.renderer.ctx.measureText(fText);
     const maxPos = Math.floor(this.renderer.width / textMeasure.width);
-    const steps = Math.ceil(maxPos );
+    const steps = Math.ceil(maxPos);
 
     const step = Math.floor((gp.lastXindex - gp.firstXIndex)/steps);
 
