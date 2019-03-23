@@ -30,6 +30,15 @@ app.prepareAndGetCanvas = function (elementId) {
 };
 app.grapicsData = graphic_data;
 
+const createElemenet = function (className, tagName , fragment ) {
+  const element = document.createElement(tagName);
+  let a = document.createAttribute('class');
+  a.value = className;
+  element.setAttributeNode(a);
+  fragment.appendChild(element);
+  return element;
+};
+
 app.createPlayground = (index) =>{
   const playground = document.getElementById('playground');
   while (playground.firstChild) {
@@ -37,14 +46,7 @@ app.createPlayground = (index) =>{
   }
   const fragment = document.createDocumentFragment();
 
-  const createElemenet = function (className, tagName = 'canvas') {
-    const element = document.createElement(tagName);
-    let a = document.createAttribute('class');
-    a.value = className;
-    element.setAttributeNode(a);
-    fragment.appendChild(element);
-    return element;
-  };
+
 
   const prepareAndGetCtx2d = function (canvas ) {
     let ctx2d = canvas.getContext('2d');
@@ -54,12 +56,14 @@ app.createPlayground = (index) =>{
     return ctx2d;
   };
 
-  const descriptionDiv = createElemenet('description', 'div');
+  const descriptionDiv = createElemenet('description', 'div', fragment);
   descriptionDiv.appendChild( document.createTextNode(` graphic data #${index}`));
 
-  const graphCanvas = createElemenet('graphCanvas');
-  const xCoordCanvas = createElemenet('xCoordCanvas');
-  const yCoordCanvas = createElemenet('yCoordCanvas');
+
+
+  const graphCanvas = createElemenet('graphCanvas','canvas', fragment);
+  const xCoordCanvas = createElemenet('xCoordCanvas', 'canvas', fragment);
+  const yCoordCanvas = createElemenet('yCoordCanvas', 'canvas', fragment);
 
   playground.appendChild(fragment);
 
@@ -76,6 +80,7 @@ app.createPlayground = (index) =>{
       canvas:yCoordCanvas,
       ctx2d:prepareAndGetCtx2d(yCoordCanvas)
     },
+    descriptionDiv:descriptionDiv
   };
 
 };
@@ -92,7 +97,7 @@ app.showGraphic = (index) => {
   let yPresenter = new YPresenter(rendererY);
   let xPresenter = new XPresenter(rendererX);
 
-  let gp = new GraphicsPresenter(renderer);
+  let gp = app.gp = new GraphicsPresenter(renderer);
   gp.stage = {width: 1000, height: 900};
 
   const graphicDatum = graphic_data[index];
@@ -107,7 +112,23 @@ app.showGraphic = (index) => {
         preparedData['XCount'] = new XCounts(data);
         break;
       case 'line':
-        preparedData['graphs'].push(new YData(data, graphicDatum['colors'][name], graphicDatum['names'][name]));
+      {
+        const graphName = graphicDatum['names'][name];
+        const graphColor = graphicDatum['colors'][name];
+        preparedData['graphs'].push(new YData(data, graphColor, graphName));
+        const template = document.getElementById('graphHandlerTemplate');
+        const handle = template.cloneNode(true);
+        //todo make it wise
+        const textEl = handle.lastChild;
+        const trigger = handle.firstChild;
+        trigger.dataset.graphIndex=preparedData['graphs'].length - 1;
+        trigger.style.borderColor = graphColor;
+        handle.id=`_gp${graphName}`;
+        textEl.innerText = name;
+        p['descriptionDiv'].appendChild(handle);
+      }
+
+
         break;
       default:
         this.logger.warn(` found unsupport type '${type}' for graph data#${index}`);
@@ -141,6 +162,21 @@ app.showGraphic = (index) => {
   gp.draw();
 
 };
+
+app.handleTrigger = (event) => {
+  const element = event.currentTarget;
+  element.classList.toggle('on');
+  const index = parseInt(element.dataset.graphIndex);
+
+  if(index!== undefined){
+    if(element.classList.value.indexOf('on') !== -1){
+      app.gp.yDatas[index].enable();
+    } else {
+      app.gp.yDatas[index].disable();
+    }
+    app.gp.redraw();
+  }
+}
 
 app.run = () => {
   let requestAnimationFrame = window.requestAnimationFrame ||

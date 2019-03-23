@@ -72,21 +72,30 @@ export class GraphicsPresenter {
     ) {
       this.firstXIndex = firstIndex;
       this.lastXindex = lastIndex;
-      this.resetMinMax();
-      this.yDatas.forEach(yData => {
-        if (yData.enabled) {
-          const gminMaxY = yData.getMinMaxByIndexes(
-            this.firstXIndex,
-            this.lastXindex
-          );
-          this.logger.log("MinMaxY", gminMaxY);
-          this.minY = Math.min(gminMaxY.min, this.minY);
-          this.maxY = Math.max(gminMaxY.max, this.maxY);
-        }
-      });
+      this._setXRange();
     }
   }
 
+  _setXRange() {
+    this.resetMinMax();
+    this.yDatas.forEach(yData => {
+      if (yData.enabled) {
+        const gminMaxY = yData.getMinMaxByIndexes(
+            this.firstXIndex,
+            this.lastXindex
+        );
+        this.logger.log("MinMaxY", gminMaxY);
+        this.minY = Math.min(gminMaxY.min, this.minY);
+        this.maxY = Math.max(gminMaxY.max, this.maxY);
+      }
+    });
+  }
+
+  redraw(){
+    this.clear();
+    this._setXRange();
+    this.draw();
+  }
   getYbyValue(value) {
     return (value - this.minY) * (this.stage.height / (this.maxY - this.minY));
   }

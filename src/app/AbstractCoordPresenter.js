@@ -39,10 +39,11 @@ export default class AbstractCoordPresenter {
     this.renderer.strokeStyle = this.textStrokeStyle;
     this.renderer.lineWidth = this.textLineWidth;
     this.renderer.fillStyle = this.textFillStyle;
-    this.renderer.scale(1, -1);
 
-    this.renderer.strokeText(value, textX, textY);
-    this.renderer.fillText(value, textX, textY);
+    this.renderer.scale(1 * this.renderer.a, -1);
+    this.renderer.strokeText(value, textX / this.renderer.a, textY);
+    this.renderer.fillText(value, textX / this.renderer.a, textY - 25);
+
     this.renderer.finishDraw();
   }
 

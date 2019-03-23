@@ -32,6 +32,6 @@ export default class YData {
         max = this.y[i];
       }
     }
-    return { min, max };
+    return {min, max};
   }
 }

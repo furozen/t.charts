@@ -22,35 +22,35 @@ export default class XPresenter extends AbstractCoordPresenter {
 
   finishDraw(gp) {
 
-    let fDate =  new Date(gp.xCount.x[gp.firstXIndex]);
-    const options = { month: 'short', day: 'numeric' };
+    let fDate = new Date(gp.xCount.x[gp.firstXIndex]);
+    const options = {month: 'short', day: 'numeric'};
     const dateTimeFormat = new Intl.DateTimeFormat('en-GB', options);
     let fText = dateTimeFormat.format(fDate);
     const textMeasure = this.renderer.ctx.measureText(fText);
     const maxPos = Math.floor(this.renderer.width / textMeasure.width);
     const steps = Math.ceil(maxPos);
 
-    const step = Math.floor((gp.lastXindex - gp.firstXIndex)/steps);
+    const step = Math.floor((gp.lastXindex - gp.firstXIndex) / steps);
 
-    for (let i = gp.firstXIndex + 1; i < gp.lastXindex; ) {
+    for (let i = gp.firstXIndex + 1; i < gp.lastXindex;) {
 
-      fDate =  new Date(gp.xCount.x[i]);
+      fDate = new Date(gp.xCount.x[i]);
       fText = dateTimeFormat.format(fDate);
       this.logger.debug("fDate:", fDate, " fText:", fText);
       let x = gp.getXbyIndex(i);
       this.drawText(x, fText);
-      i+=step;
+      i += step;
     }
 
     this.logger.debug("fDate:", fDate, " fText:", fText, " textMeasure", textMeasure);
-   /* const yStepValue = (gp.maxY - gp.minY) / this.steps;
-    const origin = gp.minY - yStepValue;
-    this.drawSteps(
-        origin < 0 ? 0 : origin,
-        gp.maxY + yStepValue,
-        this.steps + 1,
-        gp
-    );*/
+    /* const yStepValue = (gp.maxY - gp.minY) / this.steps;
+     const origin = gp.minY - yStepValue;
+     this.drawSteps(
+         origin < 0 ? 0 : origin,
+         gp.maxY + yStepValue,
+         this.steps + 1,
+         gp
+     );*/
   }
 
 }
