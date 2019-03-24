@@ -300,7 +300,7 @@ app.overtownPosChangedHandler = (playground, overtownWindow, hintDiv) => {
   })
 };
 
-
+/* dev expirements
 app.run = () => {
 
   let requestAnimationFrame = window.requestAnimationFrame;
@@ -335,7 +335,7 @@ app.run = () => {
   let yData42 = new YData(yColumn42, 'red');
   let yData43 = new YData(yColumn43, 'blue');
 
-  /* {
+  /!* {
      let ctx2d = app.prepareAndGetCanvas("canvas");
 
      const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 0, 0);
@@ -406,9 +406,9 @@ app.run = () => {
        ctx2d.lineTo(51, 57);
        ctx2d.fill();
      }
-   }*/
+   }*!/
 
-  /*
+  /!*
     {
       let ctx2d = app.prepareAndGetCanvas("canvas2");
       const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 50, -500);
@@ -442,7 +442,7 @@ app.run = () => {
       };
       update();
 
-    }*/
+    }*!/
 
   {
 
@@ -465,7 +465,7 @@ app.run = () => {
 
   }
 
-  /*{
+  /!*{
     document.getElementById('gp3').style.display = 'block';
     let ctx2d = app.prepareAndGetCanvas("canvas3");
 
@@ -519,9 +519,9 @@ app.run = () => {
     };
     update();
 
-  }*/
+  }*!/
 
-  /*{
+  /!*{
     document.getElementById('gp4').style.display = 'block';
     let ctx2d = app.prepareAndGetCanvas("canvas4");
     const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 0, 0);
@@ -562,9 +562,9 @@ app.run = () => {
     gp.draw();
 
 
-  }*/
+  }*!/
 
 
-};
+};*/
 
 export default app;

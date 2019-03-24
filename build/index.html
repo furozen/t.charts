@@ -19,7 +19,7 @@
     </style>
     <script>
       window.addEventListener('load', () => {
-        app.run();
+        // fill selector
         const selector = document.getElementById('selector');
         const fragment = document.createDocumentFragment();
         app.grapicsData.forEach((data, index) => {
@@ -201,49 +201,15 @@
 
 </style>
 <body>
-<select id="selector" onchange="app.showGraphic(this.value)" onselect="app.showGraphic(this.value)">
-</select>
+<select id="selector" onchange="app.showGraphic(this.value)" onselect="app.showGraphic(this.value)"></select>
 
 <div id="playground" class="playground">
 
 </div>
 
-<div id="playgroundTest" class="playground">
-    <div class="description"> graphic data #0
+<div id="playgroundTest" class="playground hide">
         <div id="graphHandlerTemplate" class="graphHandler" onclick="app.handlerClick(event)"><div class="trigger on" data-graph-index data-gp onclick="app.handleTrigger(event)"><span></span></div><span class="graphName">#GraphName</span></div>
-        <div class="graphHandler">
-            <div class="trigger" onclick="app.handleTrigger(event)"><span></span></div>
-            <span class="graphName">Left</span>
-        </div>
-    </div>
-    <canvas id="canvasNarrowLong" class="test2dCanvas"></canvas>
-</div>
 
-<canvas class="graphCanvas" width="487" height="300"></canvas>
-<canvas class="xCoordCanvas" width="487" height="50"></canvas>
-<canvas class="yCoordCanvas" width="54" height="300"></canvas>
-
-
-
-<canvas id="canvas" class="test2dCanvas"></canvas>
-<canvas id="canvas2" class="test2dCanvas"></canvas>
-
-<div id="gp3" style="position:relative; display: none; height: 350px" class="test2dCanvasBorders">
-    <canvas id="canvas3" class="test2dCanvasBorders"
-            style="width: 90%; height: 300px; position: absolute; left:10%; top:0px"></canvas>
-    <canvas id="xCoords3" class="test2dCanvasBorders"
-            style="width: 90%; height: 50px; position: absolute; left:10%; top:300px"></canvas>
-    <canvas id="yCoords3" class="test2dCanvasBorders"
-            style="height: 300px; width: 10%; position: absolute; left:0px; top:0px"></canvas>
-</div>
-
-<div id="gp4" style="position:relative; display: none; height: 350px" class="test2dCanvasBorders">
-    <canvas id="canvas4" class="test2dCanvasBorders"
-            style="width: 90%; height: 300px; position: absolute; left:10%; top:0px"></canvas>
-    <canvas id="xCoords4" class="test2dCanvasBorders"
-            style="width: 90%; height: 50px; position: absolute; left:10%; top:300px"></canvas>
-    <canvas id="yCoords4" class="test2dCanvasBorders"
-            style="height: 300px; width: 10%; position: absolute; left:0px; top:0px"></canvas>
 </div>
 
 </body>
