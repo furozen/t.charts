@@ -2,6 +2,13 @@ import app from "../index";
 import {createLogger} from "./Logger";
 
 const logger = createLogger('dragUtil');
+
+const addEventsListener = (element, events, handler) => {
+  events.forEach(event => {
+    element.addEventListener(event, handler);
+  })
+}
+
 export const initRangeWindow = (container, overtown) => {
   let active = false;
   let initX;
@@ -65,7 +72,7 @@ export const initRangeWindow = (container, overtown) => {
           if (newW > minWidth) {
             overtown.style.width = newW + "px";
           } else if (newW) { // will not be undefined
-            if(active === 'rightBorder'){
+            if (active === 'rightBorder') {
               left = offsetLeft; //prevent jump
               initX = event.type === "touchstart" ? event.touches[0].clientX : event.clientX;
             }
@@ -73,14 +80,14 @@ export const initRangeWindow = (container, overtown) => {
             active = true;
             logger.debug(`switch auto=true newW ${newW} > minWidth:${minWidth}`);
           }
-          if(active !== 'rightBorder') {
+          if (active !== 'rightBorder') {
             overtown.style.left = left + "px";
             momentLeft = left;
           }
           logger.debug(`${active} offset:${offsetLeft} offsetOfMove:${offsetOfMove} left:${left} momentLeft:${momentLeft} newW:${newW}  overtown.offsetLeft:${overtown.offsetLeft} `);
 
 
-          if(newW !== undefined) {
+          if (newW !== undefined) {
             momentWidth = overtown.clientWidth;
           }
         } else {
@@ -91,17 +98,49 @@ export const initRangeWindow = (container, overtown) => {
       }
     }
   };
-
-  container.addEventListener("touchstart", dragStart);
-  container.addEventListener("touchend", dragEnd);
-  container.addEventListener("touchmove", drag);
-
-  container.addEventListener("mousedown", dragStart);
-  container.addEventListener("mouseup", dragEnd);
-  container.addEventListener("mousemove", drag);
+  addEventsListener(container, ["touchstart", "mousedown"], dragStart);
+  addEventsListener(container, ["touchend", "mouseup"], dragEnd);
+  addEventsListener(container, ["touchmove", "mousemove"], drag);
 
   playground.addEventListener('OvertownPosChanged', (event) => {
     event = event;
   });
 
 };
+
+
+export const canvasTouch = (canvas, touchCallback) => {
+  let active = false;
+  const dragStart = (event) => {
+    if (event.target === canvas) {
+      active = true;
+
+      const rect = canvas.getBoundingClientRect();
+      const pageX = event.type === "touchstart" ? event.touches[0].pageX : event.screenX;
+      const pageY = event.type === "touchstart" ? event.touches[0].pageY : event.pageY;
+      const x = pageX - (rect.left + window.pageXOffset);
+      const y = pageY - (rect.top + window.pageYOffset);
+      touchCallback({x, y});
+    }
+  };
+
+  const dragEnd = () => {
+    active = false;
+    logger.debug(`canvasTouch dragEnd `);
+  };
+
+  const drag = (event) => {
+    if (active) {
+      const rect = canvas.getBoundingClientRect();
+      const pageX = event.type === "touchmove" ? event.touches[0].pageX : event.screenX;
+      const pageY = event.type === "touchmove" ? event.touches[0].pageY : event.pageY;
+      const x = pageX - (rect.left + window.pageXOffset);
+      const y = pageY - (rect.top + window.pageYOffset);
+      touchCallback({x, y});
+    }
+  };
+  addEventsListener(canvas, ["touchstart", "mousedown"], dragStart);
+  addEventsListener(canvas, ["touchend", "mouseup"], dragEnd);
+  addEventsListener(canvas, ["touchmove", "mousemove"], drag);
+
+}

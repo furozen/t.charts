@@ -1,4 +1,4 @@
-import { createLogger } from "./Logger";
+import {createLogger} from "./Logger";
 
 export class GraphicsPresenter {
   constructor(renderer) {
@@ -12,6 +12,7 @@ export class GraphicsPresenter {
     this.firstXIndex = 0;
     this.lastXIndex = undefined;
     this.renderer = renderer;
+    this.hintLineColor = 'lightgrey';
   }
 
   setYPresenter(yPresenter) {
@@ -37,8 +38,8 @@ export class GraphicsPresenter {
     this.yDatas.push(yData);
 
     const gminMaxY = yData.getMinMaxByIndexes(
-      this.firstXIndex,
-      this.lastXIndex
+        this.firstXIndex,
+        this.lastXIndex
     );
     this.logger.log("MinMaxY", gminMaxY);
     this.minY = Math.min(gminMaxY.min, this.minY);
@@ -68,8 +69,8 @@ export class GraphicsPresenter {
 
   setXRange(firstIndex, lastIndex) {
     if (
-      (isFinite(firstIndex) && firstIndex !== this.firstXIndex) ||
-      (isFinite(lastIndex) && lastIndex !== this.lastXIndex)
+        (isFinite(firstIndex) && firstIndex !== this.firstXIndex) ||
+        (isFinite(lastIndex) && lastIndex !== this.lastXIndex)
     ) {
       this.firstXIndex = firstIndex;
       this.lastXIndex = lastIndex;
@@ -92,11 +93,12 @@ export class GraphicsPresenter {
     });
   }
 
-  redraw(){
+  redraw() {
     this.clear();
     this._setXRange();
     this.draw();
   }
+
   getYbyValue(value) {
     return (value - this.minY) * (this.stage.height / (this.maxY - this.minY));
   }
@@ -104,10 +106,46 @@ export class GraphicsPresenter {
   getXbyIndex(index) {
     const xRange = this.lastXIndex - this.firstXIndex;
     const xMult = this.stage.width / xRange;
-    let x = (index - this.firstXIndex) * xMult;
-    return x;
+    return (index - this.firstXIndex) * xMult;
   }
 
+  getIndexByXCoord(x) {
+    const xRange = this.lastXIndex - this.firstXIndex;
+    const xMult = this.stage.width / xRange;
+    return Math.floor(x / xMult + this.firstXIndex);
+  }
+
+  getYByYCoord(y) {
+    const yRange = this.maxY - this.minY;
+    const yMult = this.stage.height / yRange;
+    return y / yMult + this.minY;
+  }
+
+  drawHintByIndex(i, renderer = this.renderer,) {
+    const yRange = this.maxY - this.minY;
+    const xRange = this.lastXIndex - this.firstXIndex;
+    const xMult = this.stage.width / xRange;
+    const yMult = this.stage.height / yRange;
+
+    //draw line
+    let x = (i - this.firstXIndex) * xMult;
+    renderer.prepToDraw(this.hintLineColor);
+    renderer.moveTo({x, y: 0});
+    renderer.lineTo({x, y: 800});
+    renderer.finishDraw();
+    this.yDatas.forEach((yData) => {
+      if (yData.enabled) {
+        let y = (yData.y[i] - this.minY) * yMult;
+        renderer.prepToDraw(yData.color);
+        renderer.ctx.fillStyle = 'white';
+        renderer.circle({x, y}, 10);
+        renderer.ctx.fill();
+        renderer.finishDraw();
+      }
+    });
+
+
+  }
 
 
   //TODO try Path2D
@@ -122,10 +160,10 @@ export class GraphicsPresenter {
       let x = (i - this.firstXIndex) * xMult;
       let y = (yData.y[i] - this.minY) * yMult;
       if (i === this.firstXIndex) {
-        this.renderer.moveTo({ x, y });
+        this.renderer.moveTo({x, y});
         this.logger.log(`m x:${x} y:${y}`);
       } else {
-        this.renderer.lineTo({ x, y });
+        this.renderer.lineTo({x, y});
         this.logger.log(`x:${x} y:${y}`);
       }
       if (this.yPresenter && yData.shadowLines) {
@@ -144,4 +182,6 @@ export class GraphicsPresenter {
       this.xPresenter.finishDraw(this);
     }
   }
+
+
 }

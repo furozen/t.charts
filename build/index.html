@@ -80,6 +80,39 @@
         border-right-style: groove;
     }
 
+    .playground div.hintPanel{
+        position: absolute;
+        width: fit-content;
+        min-width: 10%;
+        height: 3.3em;
+        background: white;
+        border: 1px solid lightgray;
+        border-radius: 0.5em;
+        left: 100px;
+        top: 35px;
+        text-align: center;
+        padding: 0.3em;
+    }
+    .playground div.hintPanel .date {
+        font-family: SANS-SERIF;
+        font-size: 0.8em;
+    }
+
+    .playground div.hintPanel .dataRows {
+        display: flex;
+        margin-top: 0.3em;
+    }
+    .playground div.hintPanel .dataColumn {
+        font-family: SANS-SERIF;
+        margin-left: 0.2em;
+        margin-right: 0.2em;
+    }
+    .playground div.hintPanel .dataValue {
+        font-size: 0.9em;
+    }
+    .playground div.hintPanel .dataLegend {
+        font-size: 0.8em;
+    }
 
     .playground canvas.xCoordCanvas {
         width: 90%;

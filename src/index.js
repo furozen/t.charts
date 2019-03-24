@@ -5,8 +5,8 @@ import {GraphicsPresenter} from "./app/GraphicsPresenter";
 import XCounts from "./app/XCounts";
 import YPresenter from "./app/YPresenter";
 import XPresenter from "./app/XPresenter";
-import {createLogger, LoggerSetting, LogLevel} from "./app/Logger";
-import {initRangeWindow} from "./app/dragUtils";
+import {createLogger, LogLevel} from "./app/Logger";
+import {canvasTouch, initRangeWindow} from "./app/dragUtils";
 
 
 let context = window || global;
@@ -37,7 +37,7 @@ app.prepareAndGetCanvas = function (elementId) {
 };
 app.grapicsData = graphic_data;
 
-const createElemenet = function (className, tagName , fragment ) {
+const createElemenet = function (className, tagName, fragment) {
   const element = document.createElement(tagName);
   let a = document.createAttribute('class');
   a.value = className;
@@ -47,14 +47,14 @@ const createElemenet = function (className, tagName , fragment ) {
 };
 
 
-app.createPlayground = (index) =>{
+app.createPlayground = (index) => {
   const playground = document.getElementById('playground');
   while (playground.firstChild) {
     playground.removeChild(playground.firstChild);
   }
   const fragment = document.createDocumentFragment();
 
-  const prepareAndGetCtx2d = function (canvas ) {
+  const prepareAndGetCtx2d = function (canvas) {
     let ctx2d = canvas.getContext('2d');
     ctx2d.resetTransform();
     canvas.width = canvas.clientWidth;
@@ -63,40 +63,49 @@ app.createPlayground = (index) =>{
   };
 
   const descriptionDiv = createElemenet('description', 'div', fragment);
-  descriptionDiv.appendChild( document.createTextNode(` graphic data #${index}`));
+  descriptionDiv.appendChild(document.createTextNode(` graphic data #${index}`));
 
-  const graphCanvas = createElemenet('graphCanvas','canvas', fragment);
+  const graphCanvas = createElemenet('graphCanvas', 'canvas', fragment);
+  const hintCanvas = createElemenet('graphCanvas', 'canvas', fragment);
+  const hintDiv = createElemenet('hintPanel', 'div', fragment);
   const xCoordCanvas = createElemenet('xCoordCanvas', 'canvas', fragment);
   const yCoordCanvas = createElemenet('yCoordCanvas', 'canvas', fragment);
-  const narrowGraphCanvas = createElemenet('narrowGraphCanvas','canvas', fragment);
+  const narrowGraphCanvas = createElemenet('narrowGraphCanvas', 'canvas', fragment);
 
-  const overtownWindow = createElemenet('overtownWindow','div', fragment);
+  const overtownWindow = createElemenet('overtownWindow', 'div', fragment);
 
   playground.appendChild(fragment);
-  initRangeWindow(playground,overtownWindow);
+  initRangeWindow(playground, overtownWindow);
+  canvasTouch(hintCanvas, (p) => {
+    app.onCanvasEventHandler(p, hintDiv)
+  });
 
   playground.addEventListener('OvertownPosChanged', (event) => {
     app.overtownPosChangedHandler(playground, overtownWindow);
   });
 
   return {
-    graphCanvas:{
-      canvas:graphCanvas,
-      ctx2d:prepareAndGetCtx2d(graphCanvas)
+    graphCanvas: {
+      canvas: graphCanvas,
+      ctx2d: prepareAndGetCtx2d(graphCanvas)
     },
-    narrowGraphCanvas:{
-      canvas:narrowGraphCanvas,
-      ctx2d:prepareAndGetCtx2d(narrowGraphCanvas)
+    hintCanvas: {
+      canvas: hintCanvas,
+      ctx2d: prepareAndGetCtx2d(hintCanvas)
     },
-    xCoordCanvas:{
-      canvas:xCoordCanvas,
-      ctx2d:prepareAndGetCtx2d(xCoordCanvas)
+    narrowGraphCanvas: {
+      canvas: narrowGraphCanvas,
+      ctx2d: prepareAndGetCtx2d(narrowGraphCanvas)
     },
-    yCoordCanvas:{
-      canvas:yCoordCanvas,
-      ctx2d:prepareAndGetCtx2d(yCoordCanvas)
+    xCoordCanvas: {
+      canvas: xCoordCanvas,
+      ctx2d: prepareAndGetCtx2d(xCoordCanvas)
     },
-    descriptionDiv:descriptionDiv
+    yCoordCanvas: {
+      canvas: yCoordCanvas,
+      ctx2d: prepareAndGetCtx2d(yCoordCanvas)
+    },
+    descriptionDiv: descriptionDiv
   };
 
 };
@@ -107,6 +116,7 @@ app.showGraphic = (index) => {
 
 
   const renderer = new RendererCanvas(p.graphCanvas.ctx2d, p.graphCanvas.ctx2d.canvas.width, p.graphCanvas.ctx2d.canvas.height, 0, 0);
+  app.rendererHint = new RendererCanvas(p.hintCanvas.ctx2d, p.graphCanvas.ctx2d.canvas.width, p.graphCanvas.ctx2d.canvas.height, 0, 0);
   const rendererY = new RendererCanvas(p.yCoordCanvas.ctx2d, p.graphCanvas.ctx2d.canvas.width, p.yCoordCanvas.ctx2d.canvas.height, 0, 0);
   const rendererX = new RendererCanvas(p.xCoordCanvas.ctx2d, p.xCoordCanvas.ctx2d.canvas.width, p.graphCanvas.canvas.height, 0, 0);
 
@@ -118,8 +128,8 @@ app.showGraphic = (index) => {
 
   const graphicDatum = graphic_data[index];
 
-  const preparedData = {'graphs':[]};
-  graphicDatum['columns'].forEach( (column, i) => {
+  const preparedData = {'graphs': []};
+  graphicDatum['columns'].forEach((column, i) => {
     const name = column[0];
     const data = column.slice(1);
     const type = graphicDatum['types'][name];
@@ -127,8 +137,7 @@ app.showGraphic = (index) => {
       case 'x':
         preparedData['XCount'] = new XCounts(data);
         break;
-      case 'line':
-      {
+      case 'line': {
         const graphName = graphicDatum['names'][name];
         const graphColor = graphicDatum['colors'][name];
         preparedData['graphs'].push(new YData(data, graphColor, graphName));
@@ -137,9 +146,9 @@ app.showGraphic = (index) => {
         //todo make it wise
         const textEl = handle.lastChild;
         const trigger = handle.firstChild;
-        trigger.dataset.graphIndex=preparedData['graphs'].length - 1;
+        trigger.dataset.graphIndex = preparedData['graphs'].length - 1;
         trigger.style.borderColor = graphColor;
-        handle.id=`_gp${graphName}`;
+        handle.id = `_gp${graphName}`;
         textEl.innerText = name;
         p['descriptionDiv'].appendChild(handle);
       }
@@ -153,7 +162,7 @@ app.showGraphic = (index) => {
   });
 
   gp.setXCount(preparedData['XCount']);
-  preparedData.graphs.forEach( (yData) => {
+  preparedData.graphs.forEach((yData) => {
     gp.addYData(yData);
   });
 
@@ -176,7 +185,7 @@ app.showGraphic = (index) => {
     let gp = app.narrowGP = new GraphicsPresenter(renderer);
 
     gp.setXCount(preparedData['XCount']);
-    preparedData.graphs.forEach( (yData) => {
+    preparedData.graphs.forEach((yData) => {
       gp.addYData(yData);
     });
 
@@ -188,6 +197,53 @@ app.showGraphic = (index) => {
 };
 
 
+app.onCanvasEventHandler = (p, hintDiv) => {
+  const renderer = app.gp.renderer;
+  const w = renderer.getWorldCoordinates(p.x, p.y);
+  /*
+  //check coordinates
+  app.logger.debug('x,y',p.x,p.y);
+
+
+  renderer.line({x:w.x - 10, y:w.y},{x:w.x + 10, y:w.y});
+  renderer.line({x:w.x, y:w.y - 10},{x:w.x, y:w.y + 10});
+  const ay = app.gp.getYByYCoord(w.y);
+*/
+  const index = app.gp.getIndexByXCoord(w.x);
+
+  hintDiv.style.left = p.x;
+  app.rendererHint.clear();
+
+
+  {
+    const getOrCreate = function (classNames, fragment, style) {
+      let element = fragment.getElementsByClassName(classNames)[0];
+      if (!element) {
+        element = createElemenet(classNames, 'div', fragment);
+      }
+      return element;
+    };
+
+    getOrCreate('date', hintDiv).innerText = app.gp.xCount.getHintFormatedDate(index);
+
+    const dataRowsContainer = getOrCreate('dataRows', hintDiv);
+
+    app.gp.yDatas.forEach(yData => {
+      const columnId = 'c_' + yData.name;
+      let column = document.getElementById(columnId);
+      if (!column) {
+        column = createElemenet('dataColumn', 'div', dataRowsContainer);
+        column.id = columnId;
+        column.style.color = yData.color;
+      }
+      const value = getOrCreate('dataValue', column);
+      value.innerText = yData.y[index];
+      const legend = getOrCreate('dataLegend', column);
+      legend.innerText = yData.name;
+    });
+  }
+  app.gp.drawHintByIndex(index, app.rendererHint);
+};
 
 app.handleTrigger = (event) => {
   const element = event.currentTarget;
@@ -196,8 +252,8 @@ app.handleTrigger = (event) => {
   element.classList.toggle('on');
   const index = parseInt(element.dataset.graphIndex);
 
-  if(index!== undefined){
-    if(element.classList.value.indexOf('on') !== -1){
+  if (index !== undefined) {
+    if (element.classList.value.indexOf('on') !== -1) {
       app.gp.yDatas[index].enable();
       app.narrowGP.yDatas[index].enable();
     } else {
@@ -214,7 +270,7 @@ app.handlerClick = (event) => {
   element.classList.toggle('on');
   const index = parseInt(element.firstChild.dataset.graphIndex);
 
-  if(index!== undefined){
+  if (index !== undefined) {
 
     app.gp.yDatas[index].shadowLines = element.classList.value.indexOf('on') !== -1;
 
@@ -235,12 +291,11 @@ app.overtownPosChangedHandler = (playground, overtownWindow) => {
 };
 
 
-
 app.run = () => {
 
   let requestAnimationFrame = window.requestAnimationFrame;
 
-  for(let i = 0; i < graphic_data.length; i++) {
+  for (let i = 0; i < graphic_data.length; i++) {
 
   }
 
@@ -343,41 +398,41 @@ app.run = () => {
      }
    }*/
 
-/*
-  {
-    let ctx2d = app.prepareAndGetCanvas("canvas2");
-    const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 50, -500);
+  /*
+    {
+      let ctx2d = app.prepareAndGetCanvas("canvas2");
+      const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 50, -500);
 
-    let gp = new GraphicsPresenter(renderer);
-    gp.stage = {width: 950, height: 500}
-    gp.setXCount(xCounts);
-    gp.addYData(yData1);
-    gp.addYData(yData2);
+      let gp = new GraphicsPresenter(renderer);
+      gp.stage = {width: 950, height: 500}
+      gp.setXCount(xCounts);
+      gp.addYData(yData1);
+      gp.addYData(yData2);
 
-    const lastIndex = xCounts.length - 1;
-    let firstIndex = 0;
-    const maxFirstIndex = 100;
+      const lastIndex = xCounts.length - 1;
+      let firstIndex = 0;
+      const maxFirstIndex = 100;
 
-    const update = () => {
-      gp.clear();
-      gp.setXRange(firstIndex, lastIndex);
-      gp.draw();
-      /!*      let tm = setTimeout(() => {
-              requestAnimationFrame(() => {
-                if (firstIndex <= maxFirstIndex) {
-                  update();
-                }
-                firstIndex += 5;
-                if (firstIndex > 50) {
-                  yData1.disable();
-                }
-                clearTimeout(tm);
-              })
-            }, 0);*!/
-    };
-    update();
+      const update = () => {
+        gp.clear();
+        gp.setXRange(firstIndex, lastIndex);
+        gp.draw();
+        /!*      let tm = setTimeout(() => {
+                requestAnimationFrame(() => {
+                  if (firstIndex <= maxFirstIndex) {
+                    update();
+                  }
+                  firstIndex += 5;
+                  if (firstIndex > 50) {
+                    yData1.disable();
+                  }
+                  clearTimeout(tm);
+                })
+              }, 0);*!/
+      };
+      update();
 
-  }*/
+    }*/
 
   {
 
@@ -400,61 +455,61 @@ app.run = () => {
 
   }
 
-   /*{
-     document.getElementById('gp3').style.display = 'block';
-     let ctx2d = app.prepareAndGetCanvas("canvas3");
+  /*{
+    document.getElementById('gp3').style.display = 'block';
+    let ctx2d = app.prepareAndGetCanvas("canvas3");
 
-     const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 0, -50);
+    const renderer = new RendererCanvas(ctx2d, ctx2d.canvas.width, ctx2d.canvas.height, 0, -50);
 
-     let ctxY2d = app.prepareAndGetCanvas("yCoords3");
-     const rendererY = new RendererCanvas(ctxY2d, ctx2d.canvas.width, ctxY2d.canvas.height, 0, -50);
-     let yPresenter = new YPresenter(rendererY);
+    let ctxY2d = app.prepareAndGetCanvas("yCoords3");
+    const rendererY = new RendererCanvas(ctxY2d, ctx2d.canvas.width, ctxY2d.canvas.height, 0, -50);
+    let yPresenter = new YPresenter(rendererY);
 
-     let ctxX2d = app.prepareAndGetCanvas("xCoords3");
-     const rendererX = new RendererCanvas(ctxX2d, ctxX2d.canvas.width, ctx2d.canvas.height, 0, 0);
-     let xPresenter = new XPresenter(rendererX);
+    let ctxX2d = app.prepareAndGetCanvas("xCoords3");
+    const rendererX = new RendererCanvas(ctxX2d, ctxX2d.canvas.width, ctx2d.canvas.height, 0, 0);
+    let xPresenter = new XPresenter(rendererX);
 
 
-     let gp = new GraphicsPresenter(renderer);
-     gp.stage ={ width:1000, height:900}
-     gp.setXCount(xCounts);
-     gp.addYData(yData1);
-     gp.addYData(yData2);
+    let gp = new GraphicsPresenter(renderer);
+    gp.stage ={ width:1000, height:900}
+    gp.setXCount(xCounts);
+    gp.addYData(yData1);
+    gp.addYData(yData2);
 
-     const minY = gp.minY;
-     const maxY = gp.maxY;
-     const steps = 5;
-     const yStepValue = (maxY - minY)/ steps;
+    const minY = gp.minY;
+    const maxY = gp.maxY;
+    const steps = 5;
+    const yStepValue = (maxY - minY)/ steps;
 
-     //yPresenter.drawSteps((minY-yStepValue)<0?0:(minY-yStepValue) , maxY + yStepValue, steps+1, gp );
+    //yPresenter.drawSteps((minY-yStepValue)<0?0:(minY-yStepValue) , maxY + yStepValue, steps+1, gp );
 
-     gp.setYPresenter(yPresenter);
-     gp.setXPresenter(xPresenter);
+    gp.setYPresenter(yPresenter);
+    gp.setXPresenter(xPresenter);
 
-     const lastIndex = 111;
-     let firstIndex = 0;
-     const maxFirstIndex = 100;
+    const lastIndex = 111;
+    let firstIndex = 0;
+    const maxFirstIndex = 100;
 
-     const update = () => {
-       gp.clear();
-       gp.setXRange(firstIndex, lastIndex);
-       gp.draw();
-       let tm = setTimeout(() => {
-         requestAnimationFrame(() => {
-           if (firstIndex <= maxFirstIndex) {
-             update();
-           }
-           firstIndex += 5;
-           if (firstIndex > 50) {
-             yData1.disable();
-           }
-           clearTimeout(tm);
-         })
-       }, 20);
-     };
-     update();
+    const update = () => {
+      gp.clear();
+      gp.setXRange(firstIndex, lastIndex);
+      gp.draw();
+      let tm = setTimeout(() => {
+        requestAnimationFrame(() => {
+          if (firstIndex <= maxFirstIndex) {
+            update();
+          }
+          firstIndex += 5;
+          if (firstIndex > 50) {
+            yData1.disable();
+          }
+          clearTimeout(tm);
+        })
+      }, 20);
+    };
+    update();
 
-   }*/
+  }*/
 
   /*{
     document.getElementById('gp4').style.display = 'block';
@@ -498,7 +553,6 @@ app.run = () => {
 
 
   }*/
-
 
 
 };

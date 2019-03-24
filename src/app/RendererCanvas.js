@@ -1,5 +1,8 @@
+import {createLogger} from "./Logger";
+
 const xMax = 1000;
 const yMax = 1000;
+
 
 export default class RendererCanvas {
   get font() {
@@ -52,6 +55,7 @@ export default class RendererCanvas {
     this.d = height / yMax;
     this.tx = (anchorX * width) / xMax;
     this.ty = (anchorY * height) / yMax;
+    this.logger = createLogger('Render:');
   }
 
   scale(dx, dy) {
@@ -85,6 +89,10 @@ export default class RendererCanvas {
     this.ctx.moveTo(pA.x, pA.y);
   }
 
+  circle(pA,radius){
+    this.ctx.arc(pA.x, pA.y,radius,0,Math.PI*2);
+  }
+
   finishDraw() {
     this.ctx.stroke();
     this.ctx.restore();
@@ -99,4 +107,23 @@ export default class RendererCanvas {
     this.ctx.strokeStyle = color;
     this.ctx.fillStyle = color;
   }
+
+  getTransformMatrix(){
+    //TODO polifyll
+    this.ctx.save();
+    this.ctx.transform(this.a, this.b, this.c, -1 * this.d, this.tx, this.ty);
+    this.ctx.translate(0, -yMax);
+    let transform = this.ctx.getTransform();
+    this.ctx.restore();
+    return transform;
+  }
+
+  getWorldCoordinates(tx,ty){
+
+    let invMat = this.getTransformMatrix().inverse();
+    let wX = tx * invMat.a + ty * invMat.c + invMat.e;
+    let wY = tx * invMat.b + ty * invMat.d + invMat.f;
+    return {x:wX, y:wY};
+  }
+
 }

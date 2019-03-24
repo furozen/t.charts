@@ -22,27 +22,19 @@ export default class XPresenter extends AbstractCoordPresenter {
 
   finishDraw(gp) {
 
-    let fDate = new Date(gp.xCount.x[gp.firstXIndex]);
-    const options = {month: 'short', day: 'numeric'};
-    const dateTimeFormat = new Intl.DateTimeFormat('en-GB', options);
-    let fText = dateTimeFormat.format(fDate);
+    let fText = gp.xCount.getShortFormatedDate(gp.firstXIndex);
     const textMeasure = this.renderer.ctx.measureText(fText);
     const maxPos = Math.floor(this.renderer.width / textMeasure.width);
-    const steps = Math.ceil(maxPos);
-
-    const step = Math.floor((gp.lastXIndex - gp.firstXIndex) / steps);
+    const step = Math.floor((gp.lastXIndex - gp.firstXIndex) / Math.ceil(maxPos));
 
     for (let i = gp.firstXIndex + 1; i < gp.lastXIndex;) {
-
-      fDate = new Date(gp.xCount.x[i]);
-      fText = dateTimeFormat.format(fDate);
-      let x = gp.getXbyIndex(i);
+      fText = gp.xCount.getShortFormatedDate(i);
+      const x = gp.getXbyIndex(i);
       this.drawText(x, fText);
       i += step;
     }
 
-    this.logger.verbose("fDate:", fDate, " fText:", fText, " textMeasure", textMeasure);
-
+    this.logger.verbose(" fText:", fText, " textMeasure", textMeasure);
   }
 
 }
