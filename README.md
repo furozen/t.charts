@@ -1,0 +1,1 @@
+![Image of Yaktocat](./doc/tgrapics.gif)
