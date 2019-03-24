@@ -80,8 +80,16 @@ app.createPlayground = (index) => {
     app.onCanvasEventHandler(p, hintDiv)
   });
 
+  const showOvertownWindow = () => {
+    overtownWindow.style.display='block'
+    playground.dispatchEvent(new Event('OvertownPosChanged'));
+    narrowGraphCanvas.removeEventListener('click', showOvertownWindow)
+  };
+
+  narrowGraphCanvas.addEventListener('click', showOvertownWindow)
+
   playground.addEventListener('OvertownPosChanged', (event) => {
-    app.overtownPosChangedHandler(playground, overtownWindow);
+    app.overtownPosChangedHandler(playground, overtownWindow, hintDiv );
   });
 
   return {
@@ -213,8 +221,6 @@ app.onCanvasEventHandler = (p, hintDiv) => {
 
   hintDiv.style.left = p.x;
   app.rendererHint.clear();
-
-
   {
     const getOrCreate = function (classNames, fragment, style) {
       let element = fragment.getElementsByClassName(classNames)[0];
@@ -279,7 +285,11 @@ app.handlerClick = (event) => {
   }
 };
 
-app.overtownPosChangedHandler = (playground, overtownWindow) => {
+app.overtownPosChangedHandler = (playground, overtownWindow, hintDiv) => {
+  if(hintDiv.offsetLeft > 0) {
+    app.rendererHint.clear();
+    hintDiv.style.left = -10000;
+  }
   let leftIndex = Math.floor(app.gp.maxXIndex * overtownWindow.offsetLeft / playground.clientWidth);
   let rightIndex = Math.ceil(app.gp.maxXIndex * (overtownWindow.offsetLeft + overtownWindow.offsetWidth) / playground.clientWidth);
   window.requestAnimationFrame(() => {
