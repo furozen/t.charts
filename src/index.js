@@ -1,12 +1,12 @@
 import YData from "./app/YData";
 import graphic_data from '../data/chart_data.json';
-import RenderCoords from "./app/RenderCoords";
 import RendererCanvas from "./app/RendererCanvas";
 import {GraphicsPresenter} from "./app/GraphicsPresenter";
 import XCounts from "./app/XCounts";
 import YPresenter from "./app/YPresenter";
 import XPresenter from "./app/XPresenter";
 import {createLogger, LoggerSetting, LogLevel} from "./app/Logger";
+import {initRangeWindow} from "./app/dragUtils";
 
 
 let context = window || global;
@@ -15,7 +15,13 @@ let app = context.app;
 if (!app) {
   app = context.app = {};
   app.logger = createLogger('app');
-  LoggerSetting.logLevel = 'debug';
+
+  let requestAnimationFrame = window.requestAnimationFrame ||
+      window.mozRequestAnimationFrame ||
+      window.webkitRequestAnimationFrame ||
+      window.msRequestAnimationFrame;
+
+  window.requestAnimationFrame = requestAnimationFrame;
 }
 
 
@@ -40,6 +46,7 @@ const createElemenet = function (className, tagName , fragment ) {
   return element;
 };
 
+
 app.createPlayground = (index) =>{
   const playground = document.getElementById('playground');
   while (playground.firstChild) {
@@ -63,7 +70,14 @@ app.createPlayground = (index) =>{
   const yCoordCanvas = createElemenet('yCoordCanvas', 'canvas', fragment);
   const narrowGraphCanvas = createElemenet('narrowGraphCanvas','canvas', fragment);
 
+  const overtownWindow = createElemenet('overtownWindow','div', fragment);
+
   playground.appendChild(fragment);
+  initRangeWindow(playground,overtownWindow);
+
+  playground.addEventListener('OvertownPosChanged', (event) => {
+    app.overtownPosChangedHandler(playground, overtownWindow);
+  });
 
   return {
     graphCanvas:{
@@ -146,7 +160,7 @@ app.showGraphic = (index) => {
   gp.setYPresenter(yPresenter);
   gp.setXPresenter(xPresenter);
 
-  let lastIndex = gp.lastXindex;
+  let lastIndex = gp.lastXIndex;
   let firstIndex = 0;
 
   gp.clear();
@@ -173,8 +187,12 @@ app.showGraphic = (index) => {
 
 };
 
+
+
 app.handleTrigger = (event) => {
   const element = event.currentTarget;
+  event.stopImmediatePropagation();
+  event.preventDefault();
   element.classList.toggle('on');
   const index = parseInt(element.dataset.graphIndex);
 
@@ -189,16 +207,38 @@ app.handleTrigger = (event) => {
     app.gp.redraw();
     app.narrowGP.redraw();
   }
-}
+};
+
+app.handlerClick = (event) => {
+  const element = event.currentTarget;
+  element.classList.toggle('on');
+  const index = parseInt(element.firstChild.dataset.graphIndex);
+
+  if(index!== undefined){
+
+    app.gp.yDatas[index].shadowLines = element.classList.value.indexOf('on') !== -1;
+
+    app.gp.redraw();
+    app.narrowGP.redraw();
+  }
+};
+
+app.overtownPosChangedHandler = (playground, overtownWindow) => {
+  let leftIndex = Math.floor(app.gp.maxXIndex * overtownWindow.offsetLeft / playground.clientWidth);
+  let rightIndex = Math.ceil(app.gp.maxXIndex * (overtownWindow.offsetLeft + overtownWindow.offsetWidth) / playground.clientWidth);
+  window.requestAnimationFrame(() => {
+    app.gp.clear();
+    app.gp.setXRange(leftIndex, rightIndex);
+    app.gp.draw();
+
+  })
+};
+
+
 
 app.run = () => {
-  let requestAnimationFrame = window.requestAnimationFrame ||
-      window.mozRequestAnimationFrame ||
-      window.webkitRequestAnimationFrame ||
-      window.msRequestAnimationFrame;
 
-  window.requestAnimationFrame = requestAnimationFrame;
-
+  let requestAnimationFrame = window.requestAnimationFrame;
 
   for(let i = 0; i < graphic_data.length; i++) {
 
@@ -461,6 +501,6 @@ app.run = () => {
 
 
 
-}
+};
 
 export default app;

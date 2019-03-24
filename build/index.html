@@ -32,8 +32,6 @@
         });
         selector.appendChild(fragment);
       })
-
-
     </script>
 </head>
 <style>
@@ -53,14 +51,36 @@
         top: 0px;
         border: 1px solid lawngreen;
     }
-    .playground canvas.narrowGraphCanvas{
+
+
+    .playground canvas.narrowGraphCanvas
+    {
         position: absolute;
         width: 100%;
         height: 80px;
         left: 0px;
         top: 400px;
         border: 1px solid lightgray;
+        z-index: 10;
     }
+    .playground div.overtownWindow{
+        position: absolute;
+        width: 100px;
+        height: 80px;
+        left: 100px;
+        top: 400px;
+        background: rgba(185, 206, 228, 0.33);
+        border: 1px solid lightgray;
+        z-index: 1000;
+        border-left-width: 1em;
+        border-left-color: rgba(185, 206, 228, 0.13);
+        border-left-style: ridge;
+        border-right-width: 1em;
+        border-right-color: rgba(185, 206, 228, 0.13);
+        border-right-style: groove;
+    }
+
+
     .playground canvas.xCoordCanvas {
         width: 90%;
         height: 50px;
@@ -80,12 +100,16 @@
     }
 
     .playground div.description {
+        font-family: SANS-SERIF;
+        padding-left: 1em;
+        padding-right: 1em;
         position: absolute;
         left: 0px;
         top: 360px;
-        border: 1px solid lightblue;
+       /* border: 1px solid lightblue;*/
         width: 100%;
     }
+
 
     .graphHandler {
         border-radius: 1.5em;
@@ -96,6 +120,13 @@
         width: fit-content;
         display: inline-block;
         margin-left: 1em;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    .graphHandler.on {
+        background: lightgray;
     }
 
     .graphHandler span.graphName {
@@ -115,6 +146,7 @@
         padding: 0.1em;
         border: 1px solid lightgray;
         display: inline-block;
+        background: white;
     }
 
     .trigger span {
@@ -146,7 +178,7 @@
 
 <div id="playgroundTest" class="playground">
     <div class="description"> graphic data #0
-        <div id="graphHandlerTemplate" class="graphHandler"><div class="trigger on" data-graph-index data-gp onclick="app.handleTrigger(event)"><span></span></div><span class="graphName">#GraphName</span></div>
+        <div id="graphHandlerTemplate" class="graphHandler" onclick="app.handlerClick(event)"><div class="trigger on" data-graph-index data-gp onclick="app.handleTrigger(event)"><span></span></div><span class="graphName">#GraphName</span></div>
         <div class="graphHandler">
             <div class="trigger" onclick="app.handleTrigger(event)"><span></span></div>
             <span class="graphName">Left</span>

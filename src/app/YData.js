@@ -1,9 +1,10 @@
 export default class YData {
-  constructor(y, color, name) {
+  constructor(y, color, name, shadowLines = false) {
     this.y = y;
     this.color = color;
     this.enabled = true;
     this.name = name;
+    this.shadowLines = shadowLines;
   }
 
   disable() {

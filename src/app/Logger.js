@@ -1,4 +1,4 @@
-export const LoggerSetting  ={ logLevel: 'log'};
+export const LoggerSetting  ={ logLevel: 'error'};
 const LoggerLevels = {
   log: 4,
   info: 3,
